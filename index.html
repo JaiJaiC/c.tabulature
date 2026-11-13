@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#050506">
+<meta name="description" content="A private guitar tablature and recordings library — search, read, and add new tabs.">
+<title>Tablature — Guitar Tabs &amp; Recordings</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23050506'/%3E%3Cg stroke='%23f0b357' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M8 9.5h16M8 16h16M8 22.5h16'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="./" aria-label="Tablature home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="29" height="29" rx="8.5" fill="none" stroke="currentColor" stroke-opacity=".22"/>
+        <g stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M9 10h14M9 16h14M9 22h14"/>
+        </g>
+      </svg>
+      <span class="brand-name">Tablature</span>
+    </a>
+
+    <div class="search" id="searchWrap">
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+        <path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+      <input id="search" type="search" placeholder="Search tabs, artists, tags…"
+             autocomplete="off" spellcheck="false" aria-label="Search library">
+      <button class="search-clear" id="searchClear" type="button" aria-label="Clear search" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <kbd class="search-kbd" aria-hidden="true">/</kbd>
+    </div>
+
+    <div class="topbar-actions">
+      <div class="add-wrap">
+        <button class="btn btn-primary" id="addBtn" aria-haspopup="menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="btn-label">Add</span>
+        </button>
+        <div class="menu" id="addMenu" role="menu" hidden>
+          <button class="menu-item" role="menuitem" data-action="upload">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2.5A1.5 1.5 0 005.5 20h13a1.5 1.5 0 001.5-1.5V16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <span>Upload images or audio<small>or drop files anywhere</small></span>
+          </button>
+          <button class="menu-item" role="menuitem" data-action="record">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg>
+            <span>Record with microphone<small>saved as a recording</small></span>
+          </button>
+          <button class="menu-item" role="menuitem" data-action="settings">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 7.8l1.9 1.1M17.2 15.1l1.9 1.1M4.9 16.2l1.9-1.1M17.2 8.9l1.9-1.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <span>Storage &amp; sync<small>GitHub publishing, backup</small></span>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-ghost icon-only" id="settingsBtn" aria-label="Storage and sync settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 7.8l1.9 1.1M17.2 15.1l1.9 1.1M4.9 16.2l1.9-1.1M17.2 8.9l1.9-1.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="masthead">
+    <div class="masthead-text">
+      <p class="eyebrow">Private library</p>
+      <h1 class="title">Every riff, <em>in one place</em>.</h1>
+      <p class="lede">Hand-written tabs and phone recordings. Searchable, zoomable, offline-friendly.</p>
+    </div>
+    <dl class="stats" id="stats">
+      <div><dt>Tabs</dt><dd id="statTabs">—</dd></div>
+      <div><dt>Recordings</dt><dd id="statRecs">—</dd></div>
+      <div><dt>Pages</dt><dd id="statPages">—</dd></div>
+    </dl>
+  </section>
+
+  <nav class="filters" aria-label="Filters">
+    <div class="chips" id="chips" role="group" aria-label="Filter by type">
+      <button class="chip is-active" data-filter="all" type="button">All <span class="chip-count" data-count="all"></span></button>
+      <button class="chip" data-filter="tab" type="button">Tabs <span class="chip-count" data-count="tab"></span></button>
+      <button class="chip" data-filter="recording" type="button">Recordings <span class="chip-count" data-count="recording"></span></button>
+    </div>
+    <div class="filter-right">
+      <label class="select-wrap">
+        <span class="sr-only">Sort by</span>
+        <select id="sort">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="title">Title A–Z</option>
+        </select>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </label>
+      <button class="btn btn-ghost icon-only" id="refreshBtn" title="Reload library" aria-label="Reload library">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 10-2.6 5.9M20 5v5h-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <p class="result-line" id="resultLine" aria-live="polite"></p>
+
+  <section class="grid" id="grid" aria-label="Library"></section>
+
+  <div class="empty" id="empty" hidden>
+    <svg class="empty-art" viewBox="0 0 120 120" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+        <rect x="18" y="24" width="84" height="72" rx="10" stroke-opacity=".35"/>
+        <path d="M32 44h56M32 56h56M32 68h56M32 80h56" stroke-opacity=".55"/>
+        <circle cx="60" cy="60" r="34" stroke-opacity=".18" stroke-dasharray="3 7"/>
+      </g>
+    </svg>
+    <h2 id="emptyTitle">Nothing here yet</h2>
+    <p id="emptyText">Drag a tab image into this window — it saves automatically.</p>
+    <button class="btn btn-primary" id="emptyAdd" type="button">Add a tab</button>
+  </div>
+
+  <footer class="footer">
+    <span>Local-first · your files stay yours</span>
+    <span class="dot" aria-hidden="true">·</span>
+    <button class="linklike" id="footerSettings" type="button">Storage &amp; sync</button>
+    <span class="dot" aria-hidden="true">·</span>
+    <span id="syncState">Local only</span>
+  </footer>
+</main>
+
+<!-- ══ Drop overlay ══ -->
+<div class="drop-overlay" id="dropOverlay" hidden>
+  <div class="drop-card">
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M24 32V10m0 0l-8 8m8-8l8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8 32v4a4 4 0 004 4h24a4 4 0 004-4v-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+    <p class="drop-title">Drop to add</p>
+    <p class="drop-sub">Images become tabs · audio becomes recordings</p>
+  </div>
+</div>
+
+<!-- ══ Viewer ══ -->
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="viewerTitle" hidden>
+  <div class="viewer-bar">
+    <div class="viewer-id">
+      <h2 id="viewerTitle">—</h2>
+      <p id="viewerSub">—</p>
+    </div>
+    <div class="viewer-tools">
+      <div class="counter" id="viewerCounter">1 / 1</div>
+      <button class="tool" id="zoomOut" aria-label="Zoom out" title="Zoom out">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool zoom-value" id="zoomReset" title="Reset zoom">100%</button>
+      <button class="tool" id="zoomIn" aria-label="Zoom in" title="Zoom in">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool" id="editItem" aria-label="Edit details" title="Edit details">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10-10a2.8 2.8 0 10-4-4L4 16v4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool" id="downloadItem" aria-label="Download" title="Download">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12m0 0l5-5m-5 5l-5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 20h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool tool-close" id="viewerClose" aria-label="Close viewer" title="Close (Esc)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="viewer-main">
+    <button class="nav-arrow prev" id="prevItem" aria-label="Previous item">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="viewer-scroll" id="viewerScroll"><div class="viewer-pages" id="viewerPages"></div></div>
+    <button class="nav-arrow next" id="nextItem" aria-label="Next item">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <div class="viewer-foot" id="viewerFoot"></div>
+</div>
+
+<!-- ══ Editor ══ -->
+<div class="modal" id="editor" role="dialog" aria-modal="true" aria-labelledby="editorTitle" hidden>
+  <div class="modal-panel">
+    <header class="modal-head">
+      <h2 id="editorTitle">Edit details</h2>
+      <button class="tool" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+    <form class="modal-body" id="editorForm">
+      <div class="field">
+        <label for="fTitle">Title</label>
+        <input id="fTitle" name="title" type="text" required maxlength="120" autocomplete="off">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fArtist">Artist</label>
+          <input id="fArtist" name="artist" type="text" maxlength="80" autocomplete="off" placeholder="Optional">
+        </div>
+        <div class="field">
+          <label for="fCapo">Capo</label>
+          <input id="fCapo" name="capo" type="text" maxlength="20" autocomplete="off" placeholder="e.g. 2">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fTuning">Tuning</label>
+          <input id="fTuning" name="tuning" type="text" maxlength="40" autocomplete="off" placeholder="Standard">
+        </div>
+        <div class="field">
+          <label for="fTags">Tags</label>
+          <input id="fTags" name="tags" type="text" maxlength="160" autocomplete="off" placeholder="pop, fingerstyle">
+        </div>
+      </div>
+      <div class="field">
+        <label for="fNotes">Notes</label>
+        <textarea id="fNotes" name="notes" rows="3" maxlength="600" placeholder="Anything worth remembering…"></textarea>
+      </div>
+      <div class="field" id="pagesField">
+        <label>Pages <span class="hint" id="pagesHint"></span></label>
+        <div class="page-strip" id="pageStrip"></div>
+        <button class="btn btn-ghost btn-sm" type="button" id="addPagesBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add page
+        </button>
+      </div>
+      <div class="field" id="linkField" hidden>
+        <label for="fLink">Linked tab</label>
+        <select id="fLink" name="linkedTab"><option value="">None</option></select>
+      </div>
+    </form>
+    <footer class="modal-foot">
+      <button class="btn btn-danger-ghost" id="deleteItem" type="button">Delete</button>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" data-close type="button">Cancel</button>
+      <button class="btn btn-primary" id="saveItem" type="button">Save</button>
+    </footer>
+  </div>
+</div>
+
+<!-- ══ Settings ══ -->
+<div class="modal" id="settings" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+  <div class="modal-panel">
+    <header class="modal-head">
+      <h2 id="settingsTitle">Storage &amp; sync</h2>
+      <button class="tool" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+    <div class="modal-body">
+      <section class="setting-block">
+        <h3>This device</h3>
+        <p class="muted">Everything you add is stored in your browser first — no account, no server, works offline.</p>
+        <div class="kv"><span>Stored items</span><strong id="localCount">0</strong></div>
+        <div class="kv"><span>Storage used</span><strong id="usage">—</strong></div>
+        <div class="setting-actions">
+          <button class="btn btn-ghost btn-sm" id="exportBtn" type="button">Export backup</button>
+          <button class="btn btn-ghost btn-sm" id="importBtn" type="button">Restore backup</button>
+          <input type="file" id="restoreInput" accept="application/json,.json" hidden>
+        </div>
+      </section>
+
+      <section class="setting-block">
+        <h3>Publish to GitHub <span class="tag-optional">optional</span></h3>
+        <p class="muted">Back up new tabs and recordings into your repo so they appear on every device. Files are committed through the GitHub API with a token that stays in this browser only.</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="sRepo">Repository</label>
+            <input id="sRepo" type="text" autocomplete="off" spellcheck="false" placeholder="owner/repo">
+          </div>
+          <div class="field">
+            <label for="sBranch">Branch</label>
+            <input id="sBranch" type="text" autocomplete="off" spellcheck="false" placeholder="main">
+          </div>
+        </div>
+        <div class="field">
+          <label for="sToken">Fine-grained token <span class="hint">Contents: read &amp; write</span></label>
+          <input id="sToken" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+        </div>
+        <div class="setting-actions">
+          <button class="btn btn-ghost btn-sm" id="testConnBtn" type="button">Test connection</button>
+          <button class="btn btn-ghost btn-sm" id="clearTokenBtn" type="button">Forget token</button>
+        </div>
+        <div class="kv"><span>Status</span><strong id="ghStatus">Not connected</strong></div>
+        <div class="kv"><span>Pending upload</span><strong id="pendingCount">0</strong></div>
+        <button class="btn btn-primary btn-block" id="publishBtn" type="button" disabled>Publish to GitHub</button>
+        <p class="fineprint">A token with <code>Contents</code> read/write on this repository is enough. Never commit a token into the repo itself.</p>
+      </section>
+    </div>
+    <footer class="modal-foot">
+      <div class="spacer"></div>
+      <button class="btn btn-primary" data-close type="button">Done</button>
+    </footer>
+  </div>
+</div>
+
+<!-- ══ Recorder ══ -->
+<div class="recorder" id="recorder" hidden>
+  <span class="rec-dot" aria-hidden="true"></span>
+  <span class="rec-time" id="recTime">00:00</span>
+  <span class="rec-hint">Recording…</span>
+  <button class="btn btn-danger btn-sm" id="recStop" type="button">Stop &amp; save</button>
+  <button class="btn btn-ghost btn-sm" id="recCancel" type="button">Cancel</button>
+</div>
+
+<input type="file" id="fileInput" accept="image/*,audio/*" multiple hidden>
+<input type="file" id="pageInput" accept="image/*" multiple hidden>
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

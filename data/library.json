@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-13T15:28:29Z",
+  "items": [
+    {
+      "id": "seed_22c0b82e16",
+      "type": "tab",
+      "title": "一万次悲伤",
+      "artist": "",
+      "capo": "",
+      "tuning": "",
+      "tags": [],
+      "notes": "",
+      "pages": [
+        {
+          "src": "tablature/一万次悲伤.png",
+          "thumb": "thumbs/seed_22c0b82e16.webp",
+          "w": 950,
+          "h": 1240
+        }
+      ],
+      "createdAt": "2026-11-13T15:28:29Z",
+      "updatedAt": "2026-11-13T15:28:29Z",
+      "source": "builtin"
+    },
+    {
+      "id": "seed_aa682a9332",
+      "type": "tab",
+      "title": "再见",
+      "artist": "",
+      "capo": "",
+      "tuning": "",
+      "tags": [],
+      "notes": "",
+      "pages": [
+        {
+          "src": "tablature/再见.png",
+          "thumb": "thumbs/seed_aa682a9332.webp",
+          "w": 914,
+          "h": 799
+        }
+      ],
+      "createdAt": "2026-11-13T15:27:29Z",
+      "updatedAt": "2026-11-13T15:27:29Z",
+      "source": "builtin"
+    },
+    {
+      "id": "seed_afaf123794",
+      "type": "tab",
+      "title": "南方姑娘",
+      "artist": "",
+      "capo": "",
+      "tuning": "",
+      "tags": [],
+      "notes": "",
+      "pages": [
+        {
+          "src": "tablature/南方姑娘.png",
+          "thumb": "thumbs/seed_afaf123794.webp",
+          "w": 1198,
+          "h": 1246
+        }
+      ],
+      "createdAt": "2026-11-13T15:26:29Z",
+      "updatedAt": "2026-11-13T15:26:29Z",
+      "source": "builtin"
+    },
+    {
+      "id": "seed_0cb07e48fb",
+      "type": "tab",
+      "title": "富士山下",
+      "artist": "",
+      "capo": "",
+      "tuning": "",
+      "tags": [],
+      "notes": "",
+      "pages": [
+        {
+          "src": "tablature/富士山下.png",
+          "thumb": "thumbs/seed_0cb07e48fb.webp",
+          "w": 1109,
+          "h": 1363
+        }
+      ],
+      "createdAt": "2026-11-13T15:25:29Z",
+      "updatedAt": "2026-11-13T15:25:29Z",
+      "source": "builtin"
+    },
+    {
+      "id": "seed_5b6aef3098",
+      "type": "tab",
+      "title": "小镇姑娘",
+      "artist": "",
+      "capo": "",
+      "tuning": "",
+      "tags": [],
+      "notes": "",
+      "pages": [
+        {
+          "src": "tablature/小镇姑娘.png",
+          "thumb": "thumbs/seed_5b6aef3098.webp",
+          "w": 1230,
+          "h": 1040
+        }
+      ],
+      "createdAt": "2026-11-13T15:24:29Z",
+      "updatedAt": "2026-11-13T15:24:29Z",
+      "source": "builtin"
+    },
+    {
+      "id": "seed_e7efd920e7",
+      "type": "tab",
+      "title": "我是真的爱上你",
+      "artist": "",
+      "capo": "",
+      "tuning": "",
+      "tags": [],
+      "notes": "",
+      "pages": [
+        {
+          "src": "tablature/我是真的爱上你.png",
+          "thumb": "thumbs/seed_e7efd920e7.webp",
+          "w": 986,
+          "h": 1000
+        }
+      ],
+      "createdAt": "2026-11-13T15:23:29Z",
+      "updatedAt": "2026-11-13T15:23:29Z",
+      "source": "builtin"
+    },
+    {
+      "id": "seed_203f5b3c68",
+      "type": "tab",
+      "title": "我爱你中国",
+      "artist": "",
+      "capo": "",
+      "tuning": "",
+      "tags": [],
+      "notes": "",
+      "pages": [
+        {
+          "src": "tablature/我爱你中国.png",
+          "thumb": "thumbs/seed_203f5b3c68.webp",
+          "w": 1147,
+          "h": 1264
+        }
+      ],
+      "createdAt": "2026-11-13T15:22:29Z",
+      "updatedAt": "2026-11-13T15:22:29Z",
+      "source": "builtin"
+    },
+    {
+      "id": "seed_7e093d4686",
+      "type": "tab",
+      "title": "程艾影",
+      "artist": "",
+      "capo": "",
+      "tuning": "",
+      "tags": [],
+      "notes": "",
+      "pages": [
+        {
+          "src": "tablature/程艾影.png",
+          "thumb": "thumbs/seed_7e093d4686.webp",
+          "w": 1168,
+          "h": 963
+        }
+      ],
+      "createdAt": "2026-11-13T15:21:29Z",
+      "updatedAt": "2026-11-13T15:21:29Z",
+      "source": "builtin"
+    }
+  ]
+}

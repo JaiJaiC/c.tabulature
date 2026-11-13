@@ -1,0 +1,14 @@
+# Local secrets — never commit a deploy token
+.gh-token
+.github-token
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
