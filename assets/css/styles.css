@@ -1193,3 +1193,11 @@ body.no-scroll { overflow: hidden; }
   place-items: center;
   min-height: 220px;
 }
+
+.fail-badge {
+  color: #ff9a9a;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 0 6px;
+  white-space: nowrap;
+}

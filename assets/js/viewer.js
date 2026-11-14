@@ -2,8 +2,8 @@
    viewer.js — full-screen reader: pages, zoom, swipe navigation.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as store from './store.js?v=7';
-import { toast } from './ui.js?v=7';
+import * as store from './store.js?v=8';
+import { toast } from './ui.js?v=8';
 
 const $ = (id) => document.getElementById(id);
 
@@ -140,6 +140,28 @@ function step(delta) {
 
 function pageImages() {
   return [...$('viewerPages').querySelectorAll('img')];
+}
+
+/** WebP -> PNG through a canvas, used only when the <img> refuses the bytes. */
+async function reencode(url) {
+  const response = await fetch(url);
+  const bitmap = await createImageBitmap(await response.blob());
+  const canvas = document.createElement('canvas');
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  canvas.getContext('2d').drawImage(bitmap, 0, 0);
+  bitmap.close?.();
+  return canvas.toDataURL('image/png');
+}
+
+let failures = 0;
+function noteFailure() {
+  failures += 1;
+  const badge = $('failBadge');
+  if (!badge) return;
+  badge.hidden = false;
+  badge.textContent = `⚠ ${failures}`;
+  badge.title = `${failures} page(s) failed to display on this device`;
 }
 
 /**
@@ -303,10 +325,10 @@ async function renderItem(resetScroll) {
       vs.pageUrls[index] = url;
       paintImage(img, index);
     }).catch(() => { /* ignore */ });
-    img.addEventListener('error', () => {
+    img.addEventListener('error', async () => {
       if (!img.hasAttribute('src')) return;
       const tries = Number(img.dataset.tries || 0);
-      if (tries < 3) {
+      if (tries < 2) {
         img.dataset.tries = String(tries + 1);
         setTimeout(() => {
           img.removeAttribute('src');
@@ -315,8 +337,20 @@ async function renderItem(resetScroll) {
         }, 400 * (tries + 1));
         return;
       }
+      // Last resort: re-encode the pixels through a canvas and try again.
+      if (img.dataset.rescued !== '1') {
+        img.dataset.rescued = '1';
+        try {
+          const png = await reencode(img.getAttribute('src'));
+          if (png) {
+            img.src = png;
+            return;
+          }
+        } catch { /* fall through */ }
+      }
       img.classList.add('is-failed');
       img.alt = `Page ${index + 1} could not be loaded`;
+      noteFailure();
     });
     host.appendChild(img);
   });

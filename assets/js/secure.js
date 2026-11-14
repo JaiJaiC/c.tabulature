@@ -89,12 +89,18 @@ export function lock() {
   state.key = null;
   state.items = [];
   state.unlocked = false;
-  for (const url of urls.values()) URL.revokeObjectURL(url);
   urls.clear();
 }
 
 /* ── decrypt on demand ─────────────────────────────────────── */
 
+/**
+ * Decrypts one page and hands back a `data:` URL.
+ *
+ * It used to be a `blob:` URL, but some Edge/security-software setups refuse
+ * to decode blobs created on the fly, which surfaced as a broken-image icon.
+ * A data URL is plain text, so nothing can block it.
+ */
 export async function pageUrl(encPath) {
   if (!state.unlocked || !state.key) throw new Error('Locked');
   if (urls.has(encPath)) return urls.get(encPath);
@@ -107,8 +113,16 @@ export async function pageUrl(encPath) {
   const ciphertext = raw.slice(12);
   const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, state.key, ciphertext);
 
-  const blob = new Blob([plain], { type: 'image/webp' });
-  const url = URL.createObjectURL(blob);
+  const url = await toDataUrl(new Blob([plain], { type: 'image/webp' }));
   urls.set(encPath, url);
   return url;
+}
+
+function toDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(reader.error || new Error('Could not read page'));
+    reader.readAsDataURL(blob);
+  });
 }
