@@ -97,7 +97,7 @@ if (-not $dirty) {
 
 # -- 5. bump the asset version so browsers fetch new files ----
 Step "Bumping asset version"
-$html = Get-Content index.html -Raw
+$html = [System.IO.File]::ReadAllText((Resolve-Path index.html), [System.Text.Encoding]::UTF8)
 $next = ''
 if ($html -match 'app\.js\?v=(\d+)') {
     $current = [int]$Matches[1]
