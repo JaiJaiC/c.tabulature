@@ -34,11 +34,12 @@ function cardHTML(item, index) {
   const page = item.pages?.[0];
   const tagList = (item.tags || []).slice(0, 3);
 
-  const src = page ? store.escapeHtml(page.thumb || page.src || '') : '';
+  const src = page && !page.enc ? store.escapeHtml(page.thumb || page.src || '') : '';
   const blob = page?.blobId ? ` data-blob="${store.escapeHtml(page.blobId)}"` : '';
   const enc = page?.enc ? ` data-enc="${store.escapeHtml(page.thumb || page.enc)}"` : '';
+  const srcAttr = src ? ` src="${src}"` : '';
   const media = page
-    ? `<img src="${src}"${blob}${enc} alt="" loading="lazy" decoding="async" onload="this.classList.add('is-loaded')">`
+    ? `<img${srcAttr}${blob}${enc} alt="" loading="lazy" decoding="async" onload="this.classList.add('is-loaded')">`
     : `<span class="page-fallback">No pages</span>`;
 
   const pageBadge = item.pages?.length > 1 ? `<span class="badge">${item.pages.length} pages</span>` : '';

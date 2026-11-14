@@ -47,6 +47,11 @@ export function count() {
   return state.items.length;
 }
 
+/** The AES key, for diagnostics only. */
+export function peekKey() {
+  return state.unlocked ? state.key : null;
+}
+
 /* ── unlock / lock ─────────────────────────────────────────── */
 
 export async function unlock(password) {

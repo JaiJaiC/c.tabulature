@@ -305,18 +305,18 @@ async function renderItem(resetScroll) {
     }).catch(() => { /* ignore */ });
     img.addEventListener('error', () => {
       if (!img.hasAttribute('src')) return;
-      if (img.dataset.retried) {
-        const fallback = document.createElement('div');
-        fallback.className = 'page-fallback';
-        fallback.textContent = 'This page could not be loaded.';
-        img.replaceWith(fallback);
+      const tries = Number(img.dataset.tries || 0);
+      if (tries < 3) {
+        img.dataset.tries = String(tries + 1);
+        setTimeout(() => {
+          img.removeAttribute('src');
+          const url = vs.pageUrls?.[index];
+          if (url && img.dataset.want === '1') img.src = url;
+        }, 400 * (tries + 1));
         return;
       }
-      img.dataset.retried = '1';
-      setTimeout(() => {
-        img.removeAttribute('src');
-        paintImage(img, index);
-      }, 600);
+      img.classList.add('is-failed');
+      img.alt = `Page ${index + 1} could not be loaded`;
     });
     host.appendChild(img);
   });

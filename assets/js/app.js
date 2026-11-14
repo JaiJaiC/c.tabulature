@@ -10,6 +10,7 @@ import * as editor from './editor.js';
 import * as importer from './importer.js';
 import * as github from './github.js';
 import * as secure from './secure.js';
+import { showReport } from './diag.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -48,6 +49,8 @@ async function boot() {
   renderVerse();
   ui.render();
   syncFormFromSettings();
+
+  if (new URLSearchParams(location.search).has('diag')) showReport();
 }
 
 /* ── chrome: search, filters, menu ─────────────────────────── */

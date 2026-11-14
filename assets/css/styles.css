@@ -1122,3 +1122,74 @@ body.no-scroll { overflow: hidden; }
 }
 .chrome-restore:hover { opacity: 1; color: var(--text); }
 .chrome-restore svg { width: 20px; height: 20px; }
+/* ---- diagnostics overlay ----------------------------------- */
+.diag {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(3, 3, 4, .87);
+  backdrop-filter: blur(8px);
+}
+.diag-panel {
+  width: min(780px, 100%);
+  max-height: 86dvh;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0c;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.diag-panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 13.5px;
+}
+.diag-panel header button {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.diag-bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.diag-bar input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 13px;
+}
+.diag-panel pre {
+  margin: 0;
+  padding: 14px;
+  overflow: auto;
+  font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #cfcfd6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.viewer-pages img.is-failed {
+  background: repeating-linear-gradient(45deg, #101014, #101014 8px, #0c0c0f 8px, #0c0c0f 16px);
+  color: var(--muted-2);
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+}
