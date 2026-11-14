@@ -2,8 +2,8 @@
    viewer.js — full-screen reader: pages, zoom, swipe navigation.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as store from './store.js?v=13';
-import { toast } from './ui.js?v=13';
+import * as store from './store.js?v=14';
+import { toast } from './ui.js?v=14';
 
 const $ = (id) => document.getElementById(id);
 
@@ -18,7 +18,9 @@ const vs = {
   list: [],
   page: 0,
   spread: false,
+  pages: [],
   pageUrls: [],
+  pending: new Set(),
   onEdit: null,
   lastFocus: null,
 };
@@ -99,7 +101,9 @@ export function close() {
   document.body.classList.remove('no-scroll');
   vs.id = null;
   vs.list = [];
+  vs.pages = [];
   vs.pageUrls = [];
+  vs.pending = new Set();
   if (vs.lastFocus && typeof vs.lastFocus.focus === 'function') {
     vs.lastFocus.focus({ preventScroll: true });
   }
@@ -187,13 +191,47 @@ function applyWindow(center) {
 const BLANK_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
 function paintImage(img, index) {
-  const url = vs.pageUrls?.[index];
-  if (!url) return;
   if (img.dataset.want === '1') {
-    if (img.getAttribute('src') !== url) img.src = url;
-  } else if (img.getAttribute('src') !== BLANK_PIXEL) {
-    img.src = BLANK_PIXEL;
+    const url = vs.pageUrls?.[index];
+    if (url) {
+      if (img.getAttribute('src') !== url) img.src = url;
+      return;
+    }
+    // Only fetch what is actually on screen. Asking for all nine pages at
+    // once made GitHub Pages answer 503 under the burst, which showed up as
+    // broken images on the long scores.
+    loadPage(index).then((loaded) => {
+      if (loaded && img.dataset.want === '1' && img.getAttribute('src') !== loaded) img.src = loaded;
+    }).catch(() => markFailed(img, index));
+    return;
   }
+  if (img.getAttribute('src') !== BLANK_PIXEL) img.src = BLANK_PIXEL;
+}
+
+async function loadPage(index, attempt = 0) {
+  if (vs.pageUrls?.[index]) return vs.pageUrls[index];
+  if (vs.pending.has(index)) return null;
+  vs.pending.add(index);
+  try {
+    const url = await store.urlForPage(vs.pages[index]);
+    if (url) vs.pageUrls[index] = url;
+    return url;
+  } catch (err) {
+    if (attempt < 2) {
+      await new Promise((resolve) => setTimeout(resolve, 700 * (attempt + 1)));
+      vs.pending.delete(index);
+      return loadPage(index, attempt + 1);
+    }
+    throw err;
+  } finally {
+    vs.pending.delete(index);
+  }
+}
+
+function markFailed(img, index) {
+  img.classList.add('is-failed');
+  img.alt = `Page ${index + 1} could not be loaded`;
+  noteFailure();
 }
 
 function stepPage(delta) {
@@ -319,6 +357,8 @@ async function renderItem(resetScroll) {
     p.textContent = 'This tab has no pages yet. Use the pencil to add images.';
     host.appendChild(p);
   }
+  vs.pages = pages;
+  vs.pending = new Set();
   vs.pageUrls = new Array(pages.length).fill(null);
   pages.forEach((page, index) => {
     const img = document.createElement('img');
@@ -328,19 +368,6 @@ async function renderItem(resetScroll) {
     img.decoding = 'async';
     img.loading = 'eager';
     img.src = BLANK_PIXEL;
-
-    const fetchPage = () => store.urlForPage(page).then((url) => {
-      if (!url) throw new Error('empty page');
-      vs.pageUrls[index] = url;
-      paintImage(img, index);
-    });
-    fetchPage().catch(() => setTimeout(() => {
-      fetchPage().catch(() => {
-        img.classList.add('is-failed');
-        img.alt = `Page ${index + 1} could not be loaded`;
-        noteFailure();
-      });
-    }, 800));
     img.addEventListener('error', async () => {
       const current = img.getAttribute('src');
       if (!current || current === BLANK_PIXEL) return;
@@ -367,9 +394,7 @@ async function renderItem(resetScroll) {
           }
         } catch { /* fall through */ }
       }
-      img.classList.add('is-failed');
-      img.alt = `Page ${index + 1} could not be loaded`;
-      noteFailure();
+      markFailed(img, index);
     });
     host.appendChild(img);
   });

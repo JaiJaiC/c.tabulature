@@ -3,8 +3,8 @@
    counters, chips, empty states and toasts.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as store from './store.js?v=13';
-import * as secure from './secure.js?v=13';
+import * as store from './store.js?v=14';
+import * as secure from './secure.js?v=14';
 
 const $ = (id) => document.getElementById(id);
 

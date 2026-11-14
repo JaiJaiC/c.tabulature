@@ -3,8 +3,8 @@
    step fails on this device: fetch, decrypt, or image decode.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as secure from './secure.js?v=13';
-import * as store from './store.js?v=13';
+import * as secure from './secure.js?v=14';
+import * as store from './store.js?v=14';
 
 const MAGIC = 'TBL1';
 const ONE_PIXEL_WEBP = 'UklGRjoAAABXRUJQVlA4IC4AAADQAQCdASoCAAIAAUAmJaACdLoB+AADsAD+88Jn/qcfjSPGkfSb/+Smv8bcdgAA';
