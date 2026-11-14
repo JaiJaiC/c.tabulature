@@ -52,15 +52,21 @@ const items = [];
 for (const item of manifest.items) {
   const pages = [];
   for (const [index, page] of item.pages.entries()) {
-    const full = `secure/${item.id}-p${index + 1}.enc`;
-    const fullBuffer = encrypt(fs.readFileSync(path.join(STAGE, page.full)));
+    // A content hash in the filename means a rebuilt bundle always gets new
+    // URLs, so no browser can keep serving a stale copy from its cache.
+    const fullBytes = fs.readFileSync(path.join(STAGE, page.full));
+    const fullHash = crypto.createHash('sha256').update(fullBytes).digest('hex').slice(0, 8);
+    const full = `secure/${item.id}-p${index + 1}-${fullHash}.enc`;
+    const fullBuffer = encrypt(fullBytes);
     fs.writeFileSync(path.join(ROOT, full), fullBuffer);
     bytes += fullBuffer.length;
 
     const entry = { enc: full, w: page.w, h: page.h };
     if (page.thumb) {
-      const thumb = `secure/${item.id}-t1.enc`;
-      const thumbBuffer = encrypt(fs.readFileSync(path.join(STAGE, page.thumb)));
+      const thumbBytes = fs.readFileSync(path.join(STAGE, page.thumb));
+      const thumbHash = crypto.createHash('sha256').update(thumbBytes).digest('hex').slice(0, 8);
+      const thumb = `secure/${item.id}-t1-${thumbHash}.enc`;
+      const thumbBuffer = encrypt(thumbBytes);
       fs.writeFileSync(path.join(ROOT, thumb), thumbBuffer);
       bytes += thumbBuffer.length;
       entry.thumb = thumb;

@@ -4,8 +4,8 @@
    (Git Data API), so every device sees the same library.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as db from './db.js?v=15';
-import * as store from './store.js?v=15';
+import * as db from './db.js?v=16';
+import * as store from './store.js?v=16';
 
 const API = 'https://api.github.com';
 const MANIFEST_PATH = 'data/library.json';

@@ -4,8 +4,8 @@
    handles search, sorting and blob URL lifecycles.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as db from './db.js?v=15';
-import * as secure from './secure.js?v=15';
+import * as db from './db.js?v=16';
+import * as secure from './secure.js?v=16';
 
 export const state = {
   manifestItems: [],
