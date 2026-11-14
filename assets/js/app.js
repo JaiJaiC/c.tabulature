@@ -132,6 +132,10 @@ function bindChrome() {
   });
 
   $('settingsBtn').addEventListener('click', openSettings);
+  $('pageFullscreen').addEventListener('click', togglePageFullscreen);
+  document.addEventListener('fullscreenchange', () => {
+    $('pageFullscreen').classList.toggle('is-on', Boolean(document.fullscreenElement));
+  });
 
   // Global shortcuts
   document.addEventListener('keydown', (event) => {
@@ -397,6 +401,18 @@ async function restoreBackup(file) {
 
 const LOCKED_SHELVES = ['piano', 'fingerstyle'];
 let pendingFilter = 'piano';
+
+async function togglePageFullscreen() {
+  if (document.fullscreenElement) {
+    try { await document.exitFullscreen(); } catch { /* ignore */ }
+    return;
+  }
+  try {
+    await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+  } catch {
+    ui.toast('This browser does not allow fullscreen', { error: true });
+  }
+}
 
 function applyFilter(filter) {
   document.querySelectorAll('.chip').forEach((c) => {

@@ -35,7 +35,6 @@
       <button class="search-clear" id="searchClear" type="button" aria-label="Clear search" hidden>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
-      <kbd class="search-kbd" aria-hidden="true">/</kbd>
     </div>
 
     <div class="topbar-actions">
@@ -55,6 +54,11 @@
           </button>
         </div>
       </div>
+      <button class="btn btn-ghost icon-only" id="pageFullscreen" aria-label="Fullscreen" title="Fullscreen">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <button class="btn btn-ghost icon-only" id="settingsBtn" aria-label="Storage and sync settings">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 7.8l1.9 1.1M17.2 15.1l1.9 1.1M4.9 16.2l1.9-1.1M17.2 8.9l1.9-1.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
       </button>
@@ -166,6 +170,12 @@
       <button class="tool" id="downloadItem" aria-label="Download" title="Download">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12m0 0l5-5m-5 5l-5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 20h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
       </button>
+      <button class="tool" id="toggleChrome" aria-label="Hide top bar" title="Hide top bar">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M3.5 9.5h17" stroke="currentColor" stroke-width="1.7"/>
+        </svg>
+      </button>
       <button class="tool tool-close" id="viewerClose" aria-label="Close viewer" title="Close (Esc)">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
       </button>
@@ -181,19 +191,19 @@
     </button>
   </div>
   <div class="viewer-foot" id="viewerFoot"></div>
+  <button class="chrome-restore" id="chromeRestore" type="button" aria-label="Show controls" title="Show controls" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
 </div>
 
 <!-- ══ Password gate ══ -->
-<div class="modal" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle" hidden>
+<div class="modal" id="gate" role="dialog" aria-modal="true" aria-label="Password" hidden>
   <div class="modal-panel modal-narrow">
-    <header class="modal-head">
-      <h2 id="gateTitle">Locked shelf</h2>
-      <button class="tool" data-close aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
-      </button>
-    </header>
+
     <div class="modal-body">
-      <p class="muted">Piano and Fingerstyle scores are stored encrypted. Enter the password to open them for this visit — every refresh asks again.</p>
+      
       <div class="field">
         <label for="gatePass">Password</label>
         <input id="gatePass" type="password" autocomplete="current-password" placeholder="Password">

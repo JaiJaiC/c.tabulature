@@ -1060,9 +1060,7 @@ body.no-scroll { overflow: hidden; }
 /* ---- daily verse ------------------------------------------- */
 .verse {
   margin: 0;
-  padding-left: clamp(14px, 1.6vw, 20px);
   max-width: 30ch;
-  border-left: 2px solid rgba(240, 179, 87, .45);
   font-family: var(--serif);
   font-style: italic;
   font-weight: 400;
@@ -1099,3 +1097,28 @@ body.no-scroll { overflow: hidden; }
 /* ---- fullscreen fallback (iOS has no element fullscreen) ---- */
 .viewer.is-immersive .viewer-foot { display: none; }
 .viewer.is-immersive .viewer-pages { padding-bottom: 24px; }
+/* ---- viewer: hide the chrome --------------------------------- */
+.viewer.is-chrome-hidden .viewer-bar,
+.viewer.is-chrome-hidden .viewer-foot,
+.viewer.is-chrome-hidden .nav-arrow { display: none; }
+
+.chrome-restore {
+  position: fixed;
+  top: calc(10px + var(--safe-t));
+  right: 12px;
+  z-index: 6;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(12, 12, 15, .86);
+  color: var(--muted);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  opacity: .5;
+  transition: opacity .2s var(--ease), color .2s var(--ease);
+}
+.chrome-restore:hover { opacity: 1; color: var(--text); }
+.chrome-restore svg { width: 20px; height: 20px; }

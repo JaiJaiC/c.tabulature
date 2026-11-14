@@ -47,6 +47,8 @@ export function init({ onEdit }) {
     applySpread();
   });
   $('toggleFullscreen').addEventListener('click', toggleFullscreen);
+  $('toggleChrome').addEventListener('click', () => setChromeHidden(true));
+  $('chromeRestore').addEventListener('click', () => setChromeHidden(false));
 
   document.addEventListener('fullscreenchange', () => {
     const active = Boolean(document.fullscreenElement);
@@ -76,12 +78,21 @@ export function open(id) {
 
   $('viewer').hidden = false;
   document.body.classList.add('no-scroll');
+  setChromeHidden(false);
   renderItem(true);
   $('viewerClose').focus({ preventScroll: true });
 }
 
+/** Hiding the bar gives the page the whole screen; a floating chevron brings it back. */
+function setChromeHidden(hidden) {
+  $('viewer').classList.toggle('is-chrome-hidden', hidden);
+  $('chromeRestore').hidden = !hidden;
+  recompute();
+}
+
 export function close() {
   if ($('viewer').hidden) return;
+  setChromeHidden(false);
   $('viewer').hidden = true;
   $('viewerPages').innerHTML = '';
   document.body.classList.remove('no-scroll');
@@ -255,7 +266,7 @@ async function renderItem(resetScroll) {
     img.alt = `${item.title || 'Tab'} — page ${index + 1}`;
     if (page.w && page.h) img.style.aspectRatio = `${page.w} / ${page.h}`;
     img.decoding = 'async';
-    img.loading = index === 0 ? 'eager' : 'lazy';
+    img.loading = 'eager';
     store.urlForPage(page).then((url) => {
       if (url) img.src = url;
     }).catch(() => { /* ignore */ });
