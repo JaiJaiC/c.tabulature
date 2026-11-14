@@ -124,7 +124,7 @@ def main() -> int:
         seeded.append(
             {
                 "id": seed_id(name),
-                "type": "tab",
+                "type": "guitar",
                 "title": title,
                 "artist": artist,
                 "capo": "",

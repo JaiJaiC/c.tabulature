@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   editor.js — metadata sheet for a tab or recording: rename, tag,
-   add or drop pages, link a recording to its tab, delete.
+   editor.js — metadata sheet for a tab: rename, tag, add or drop pages.
    ═══════════════════════════════════════════════════════════════ */
 
 import * as store from './store.js';
@@ -60,17 +59,14 @@ export function open(id) {
   editing.editablePages = true;
   lastFocus = document.activeElement;
 
-  $('editorTitle').textContent = item.type === 'recording' ? 'Edit recording' : 'Edit tab';
+  $('editorTitle').textContent = item.type === 'piano' ? 'Edit piano tab' : 'Edit guitar tab';
   $('fTitle').value = item.title || '';
   $('fArtist').value = item.artist || '';
   $('fCapo').value = item.capo || '';
   $('fTuning').value = item.tuning || '';
   $('fTags').value = (item.tags || []).join(', ');
   $('fNotes').value = item.notes || '';
-
-  $('pagesField').hidden = item.type === 'recording';
-  $('linkField').hidden = item.type !== 'recording';
-  if (item.type === 'recording') fillLinkSelect(item);
+  $('fType').value = item.type === 'piano' ? 'piano' : 'guitar';
 
   const del = $('deleteItem');
   del.textContent = item.source === 'local' ? 'Delete' : 'Hide from this device';
@@ -104,15 +100,6 @@ export async function receivePages(files) {
   renderPages(editing);
   toast(files.length === 1 ? 'Page added' : `${files.length} pages added`);
   hooks.onSaved(item.id);
-}
-
-function fillLinkSelect(item) {
-  const select = $('fLink');
-  const tabs = store.allItems().filter((i) => i.type === 'tab' && i.id !== item.id);
-  select.innerHTML = `<option value="">None</option>${tabs
-    .map((t) => `<option value="${store.escapeHtml(t.id)}">${store.escapeHtml(t.title)}</option>`)
-    .join('')}`;
-  select.value = item.linkedTab || '';
 }
 
 async function renderPages(item) {
@@ -188,7 +175,7 @@ async function save() {
   fresh.tuning = $('fTuning').value.trim();
   fresh.tags = store.parseTags($('fTags').value);
   fresh.notes = $('fNotes').value.trim();
-  if (fresh.type === 'recording') fresh.linkedTab = $('fLink').value;
+  fresh.type = $('fType').value === 'piano' ? 'piano' : 'guitar';
 
   await store.save(fresh);
   hooks.onSaved(fresh.id);

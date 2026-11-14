@@ -1,6 +1,6 @@
 # Tablature
 
-A private guitar tablature and recording library — black, quiet, and built for a
+A private guitar and piano tablature library — black, quiet, and built for a
 phone propped up on a music stand.
 
 **Live site:** https://jaiaic.github.io/c.tabulature/
@@ -9,11 +9,10 @@ phone propped up on a music stand.
 
 ## What it does
 
-- **Library grid** of every tab you own, with thumbnails, artist, capo and tags.
+- **Library grid** of every tab you own, sorted A-Z, with thumbnails, artist, capo and tags.
 - **Search** across titles, artists, capo, tuning, tags and notes (`/` focuses it).
 - **Reader** with zoom, pinch-to-zoom, double-tap, swipe and keyboard navigation.
-- **Recordings** — upload audio files or record straight from the microphone,
-  then link a take to the tab it belongs to.
+- **Guitar and piano** tabs, filtered from the top bar and switchable in the editor.
 - **Add by dragging** an image (or several) anywhere onto the page. It is saved
   to the browser immediately — no dialog, no "upload" button.
 - **Works on phone, tablet and desktop**, offline after the first visit.
@@ -33,8 +32,8 @@ Storage is therefore layered:
 When both layers hold the same item, the newest edit wins. Items added locally
 show an **On device** badge until they are published.
 
-Open **Storage & sync** to export a JSON backup (with the images and audio
-inlined) and to restore one.
+Open **Storage & sync** to export a JSON backup (with the images inlined) and to
+restore one.
 
 ## Adding tabs
 
@@ -88,7 +87,7 @@ assets/js/
   store.js               merges manifest + local items, search, sorting
   db.js                  IndexedDB and localStorage
   ui.js                  grid, counters, toasts
-  viewer.js              reader, zoom, gestures, audio player
+  viewer.js              reader, zoom, gestures, tap-to-exit
   editor.js              metadata sheet and page management
   importer.js            drag & drop, paste, file picking, microphone
   github.js              publish to the repository via the Git Data API

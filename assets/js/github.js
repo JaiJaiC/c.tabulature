@@ -110,7 +110,7 @@ export async function publish(settings, { onProgress = () => {} } = {}) {
   /* 2 — upload media as blobs */
   const files = []; // { path, content }
   let fileIndex = 0;
-  const total = pending.reduce((n, i) => n + (i.pages?.length || 0) + (i.audio ? 1 : 0), 0) || 1;
+  const total = pending.reduce((n, i) => n + (i.pages?.length || 0), 0) || 1;
 
   for (const item of pending) {
     if (item.pages?.length) {
@@ -128,19 +128,6 @@ export async function publish(settings, { onProgress = () => {} } = {}) {
         });
         item._publishedPages = item._publishedPages || [];
         item._publishedPages[i] = { src: `${MEDIA_DIR}/${item.id}/p${i + 1}.${ext}`, w: page.w, h: page.h };
-      }
-    }
-    if (item.audio?.blobId) {
-      const blob = await db.getBlob(item.audio.blobId);
-      if (blob) {
-        fileIndex++;
-        onProgress(`Uploading ${fileIndex}/${total} · ${item.title}`);
-        const ext = item.audio.ext || extensionFor(blob.type, 'mp3');
-        files.push({
-          path: `${MEDIA_DIR}/${item.id}/audio.${ext}`,
-          content: await blobToBase64(blob),
-        });
-        item._publishedAudio = { src: `${MEDIA_DIR}/${item.id}/audio.${ext}`, duration: item.audio.duration || 0 };
       }
     }
   }
@@ -196,7 +183,7 @@ export async function publish(settings, { onProgress = () => {} } = {}) {
     if (!local) continue;
     local.publishedAt = now;
     delete local._publishedPages;
-    delete local._publishedAudio;
+    local.type = local.type === 'piano' ? 'piano' : 'guitar';
     await db.putItem(local);
   }
 
@@ -217,26 +204,19 @@ function cloudEntry(item, now) {
 
   const entry = {
     id: item.id,
-    type: item.type,
+    type: item.type === 'piano' ? 'piano' : 'guitar',
     title: item.title,
     artist: item.artist || '',
     capo: item.capo || '',
     tuning: item.tuning || '',
     tags: item.tags || [],
     notes: item.notes || '',
+    pages,
     createdAt: item.createdAt,
     updatedAt: now,
     source: 'cloud',
   };
 
-  if (item.type === 'recording') {
-    entry.audio = item._publishedAudio || (item.audio?.src
-      ? { src: item.audio.src, duration: item.audio.duration || 0 }
-      : null);
-    if (item.linkedTab) entry.linkedTab = item.linkedTab;
-  } else {
-    entry.pages = pages;
-  }
   return entry;
 }
 

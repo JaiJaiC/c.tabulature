@@ -12,7 +12,6 @@ export const state = {
   hidden: new Set(),
   query: '',
   filter: 'all',
-  sort: 'newest',
   ready: false,
   manifestError: null,
   lastSync: null,
@@ -54,31 +53,6 @@ export async function urlForPage(page) {
   return page.src || '';
 }
 
-export async function urlForAudio(item) {
-  const audio = item.audio;
-  if (!audio) return '';
-  if (audio.blobId) {
-    const key = `audio:${audio.blobId}`;
-    if (urls.has(key)) return urls.get(key);
-    const blob = await db.getBlob(audio.blobId);
-    if (!blob) return '';
-    const url = URL.createObjectURL(blob);
-    urls.set(key, url);
-    return url;
-  }
-  return audio.src || '';
-}
-
-export async function blobFor(item, kind, index = 0) {
-  if (kind === 'audio') {
-    const url = await urlForAudio(item);
-    if (!url) return null;
-    return { url, name: item.title };
-  }
-  const page = item.pages?.[index];
-  return page ? { url: await urlForPage(page), name: `${item.title}${item.pages.length > 1 ? ` p${index + 1}` : ''}` } : null;
-}
-
 /* ── loading ───────────────────────────────────────────────── */
 
 export async function loadManifest() {
@@ -103,8 +77,7 @@ export async function loadLocal() {
 
 export async function init() {
   const s = db.getSettings();
-  state.filter = s.filter || 'all';
-  state.sort = s.sort || 'newest';
+  state.filter = ['guitar', 'piano'].includes(s.filter) ? s.filter : 'all';
   state.hidden = new Set(Array.isArray(s.hidden) ? s.hidden : []);
   await Promise.all([loadManifest(), loadLocal()]);
   state.ready = true;
@@ -118,23 +91,36 @@ export async function refresh() {
 
 /* ── merging ───────────────────────────────────────────────── */
 
+/** Older data used type "tab"; anything unrecognised is treated as guitar. */
+function kindOf(item) {
+  if (item.type === 'piano') return 'piano';
+  if (item.type === 'recording') return 'recording';
+  return 'guitar';
+}
+
 function merge() {
   const map = new Map();
   for (const item of state.manifestItems) {
     if (!item || !item.id) continue;
-    map.set(item.id, { ...item, source: item.source || 'cloud' });
+    const kind = kindOf(item);
+    if (kind === 'recording') continue;
+    map.set(item.id, { ...item, type: kind, source: item.source || 'cloud' });
   }
   for (const item of state.localItems) {
     if (!item || !item.id) continue;
+    const kind = kindOf(item);
+    if (kind === 'recording') continue;
     const existing = map.get(item.id);
     if (!existing) {
-      map.set(item.id, { ...item, source: 'local' });
+      map.set(item.id, { ...item, type: kind, source: 'local' });
       continue;
     }
     // Same id in both places → newest edit wins, cloud wins on a tie.
     const a = Date.parse(item.updatedAt || item.createdAt || 0) || 0;
     const b = Date.parse(existing.updatedAt || existing.createdAt || 0) || 0;
-    map.set(item.id, a > b ? { ...item, source: 'local' } : { ...existing, source: existing.source || 'cloud' });
+    map.set(item.id, a > b
+      ? { ...item, type: kind, source: 'local' }
+      : { ...existing, type: existing.type, source: existing.source || 'cloud' });
   }
   return [...map.values()];
 }
@@ -167,7 +153,7 @@ function haystack(item) {
     item.tuning,
     (item.tags || []).join(' '),
     item.notes,
-    item.type === 'recording' ? 'recording audio' : 'tab tablature score sheet',
+    item.type === 'piano' ? 'piano keyboard 钢琴 钢琴谱' : 'guitar tab tablature score sheet 吉他谱',
   ].join(' '));
 }
 
@@ -190,15 +176,9 @@ export function isVisible(item) {
 
 export function visibleItems() {
   const items = allItems().filter(isVisible);
-  const sort = state.sort;
-  items.sort((a, b) => {
-    if (sort === 'title') {
-      return String(a.title || '').localeCompare(String(b.title || ''), undefined, { numeric: true, sensitivity: 'base' });
-    }
-    const ta = Date.parse(a.createdAt || 0) || 0;
-    const tb = Date.parse(b.createdAt || 0) || 0;
-    return sort === 'oldest' ? ta - tb : tb - ta;
-  });
+  items.sort((a, b) =>
+    String(a.title || '').localeCompare(String(b.title || ''), undefined, { numeric: true, sensitivity: 'base' }),
+  );
   return items;
 }
 
@@ -206,18 +186,17 @@ export function counts() {
   const items = allItems().filter((i) => !state.hidden.has(i.id) && matches(i));
   return {
     all: items.length,
-    tab: items.filter((i) => i.type === 'tab').length,
-    recording: items.filter((i) => i.type === 'recording').length,
+    guitar: items.filter((i) => i.type === 'guitar').length,
+    piano: items.filter((i) => i.type === 'piano').length,
   };
 }
 
 export function stats() {
   const items = allItems().filter((i) => !state.hidden.has(i.id));
-  const tabs = items.filter((i) => i.type === 'tab');
   return {
-    tabs: tabs.length,
-    recordings: items.filter((i) => i.type === 'recording').length,
-    pages: tabs.reduce((n, i) => n + (i.pages?.length || 0), 0),
+    guitar: items.filter((i) => i.type === 'guitar').length,
+    piano: items.filter((i) => i.type === 'piano').length,
+    pages: items.reduce((n, i) => n + (i.pages?.length || 0), 0),
     local: state.localItems.length,
     unpublished: state.localItems.filter((i) => !i.publishedAt).length,
   };
@@ -233,7 +212,7 @@ export function draft(partial = {}) {
   const ts = db.nowISO();
   return {
     id: db.uid(),
-    type: 'tab',
+    type: 'guitar',
     title: 'Untitled',
     artist: '',
     capo: '',
@@ -241,7 +220,6 @@ export function draft(partial = {}) {
     tags: [],
     notes: '',
     pages: [],
-    linkedTab: '',
     createdAt: ts,
     updatedAt: ts,
     ...partial,
@@ -265,10 +243,6 @@ export async function remove(id) {
         revokeUrl(page.blobId);
       }
     }
-    if (item.audio?.blobId) {
-      await db.removeBlob(item.audio.blobId);
-      revokeUrl(`audio:${item.audio.blobId}`);
-    }
   }
   if (state.localItems.some((i) => i.id === id)) {
     await db.removeItem(id);
@@ -290,11 +264,6 @@ export function setFilter(f) {
   db.saveSettings({ filter: f });
   emit();
 }
-export function setSort(s) {
-  state.sort = s;
-  db.saveSettings({ sort: s });
-  emit();
-}
 export function restoreHidden() {
   state.hidden.clear();
   db.saveSettings({ hidden: [] });
@@ -305,14 +274,11 @@ export function restoreHidden() {
 
 export function subtitle(item) {
   const bits = [];
+  if (item.type === 'piano') bits.push('Piano');
   if (item.artist) bits.push(item.artist);
   if (item.capo) bits.push(`Capo ${item.capo}`);
   if (item.tuning && item.tuning.toLowerCase() !== 'standard') bits.push(item.tuning);
-  if (item.type === 'recording') {
-    bits.push(db.formatDuration(item.audio?.duration || item.duration || 0));
-  } else if (item.pages?.length > 1) {
-    bits.push(`${item.pages.length} pages`);
-  }
+  if (item.pages?.length > 1) bits.push(`${item.pages.length} pages`);
   return bits.filter(Boolean).join(' · ');
 }
 

@@ -82,10 +82,6 @@ function bindChrome() {
     store.setFilter(filter);
   });
 
-  const sort = $('sort');
-  sort.value = store.state.sort;
-  sort.addEventListener('change', () => store.setSort(sort.value));
-
   $('refreshBtn').addEventListener('click', async () => {
     $('refreshBtn').disabled = true;
     await store.refresh();
@@ -119,7 +115,6 @@ function bindChrome() {
     closeMenu();
     const action = item.getAttribute('data-action');
     if (action === 'upload') importer.pickFiles();
-    if (action === 'record') await importer.startRecording();
     if (action === 'settings') openSettings();
   });
   document.addEventListener('click', (event) => {
@@ -127,7 +122,6 @@ function bindChrome() {
   });
 
   $('settingsBtn').addEventListener('click', openSettings);
-  $('footerSettings').addEventListener('click', openSettings);
 
   // Global shortcuts
   document.addEventListener('keydown', (event) => {
@@ -142,13 +136,6 @@ function bindChrome() {
     if (event.key === 'Escape') {
       closeMenu();
       if (!$('settings').hidden) closeSettings();
-    }
-  });
-
-  // Warn about unsaved work in a tab? Not needed — everything auto-saves.
-  window.addEventListener('beforeunload', () => {
-    if (importer.isRecording()) {
-      /* the browser will ask if we return a string, but modern browsers ignore it */
     }
   });
 }

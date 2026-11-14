@@ -4,7 +4,6 @@
    ═══════════════════════════════════════════════════════════════ */
 
 import * as store from './store.js';
-import * as db from './db.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -25,50 +24,27 @@ export function toast(message, { error = false, ms = 2600 } = {}) {
   }, ms);
 }
 
-/* ── decorative waveform ───────────────────────────────────── */
-
-function waveHTML(id) {
-  let seed = 0;
-  for (let i = 0; i < id.length; i++) seed = (seed * 31 + id.charCodeAt(i)) >>> 0;
-  const bars = [];
-  for (let i = 0; i < 34; i++) {
-    seed = (seed * 1664525 + 1013904223) >>> 0;
-    const h = 12 + ((seed >>> 9) % 88);
-    bars.push(`<i style="height:${h}%"></i>`);
-  }
-  return `<span class="wave" aria-hidden="true">${bars.join('')}</span>`;
-}
-
 /* ── card ──────────────────────────────────────────────────── */
 
 function cardHTML(item, index) {
   const id = store.escapeHtml(item.id);
   const title = store.highlight(item.title || 'Untitled');
   const sub = store.escapeHtml(store.subtitle(item));
-  const isAudio = item.type === 'recording';
   const page = item.pages?.[0];
   const tagList = (item.tags || []).slice(0, 3);
 
-  let media;
-  if (isAudio) {
-    media = `${waveHTML(item.id)}<span class="card-media-inner play-orb">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
-      </span>
-      <span class="audio-dur">${store.escapeHtml(db.formatDuration(item.audio?.duration || 0))}</span>`;
-  } else {
-    const src = page ? store.escapeHtml(page.thumb || page.src || '') : '';
-    const blob = page?.blobId ? ` data-blob="${store.escapeHtml(page.blobId)}"` : '';
-    media = page
-      ? `<img src="${src}"${blob} alt="" loading="lazy" decoding="async" onload="this.classList.add('is-loaded')">`
-      : `<span class="page-fallback">No pages</span>`;
-  }
+  const src = page ? store.escapeHtml(page.thumb || page.src || '') : '';
+  const blob = page?.blobId ? ` data-blob="${store.escapeHtml(page.blobId)}"` : '';
+  const media = page
+    ? `<img src="${src}"${blob} alt="" loading="lazy" decoding="async" onload="this.classList.add('is-loaded')">`
+    : `<span class="page-fallback">No pages</span>`;
 
-  const pageBadge = !isAudio && item.pages?.length > 1 ? `<span class="badge">${item.pages.length} pages</span>` : '';
+  const pageBadge = item.pages?.length > 1 ? `<span class="badge">${item.pages.length} pages</span>` : '';
   const localBadge = item.source === 'local' && !item.publishedAt ? `<span class="badge-local">On device</span>` : '';
 
   return `
     <article class="card" data-id="${id}" data-type="${item.type}" ${firstPaint ? `style="animation-delay:${Math.min(index * 22, 260)}ms"` : ''}>
-      <button class="card-media${isAudio ? ' is-audio' : ''}" data-open="${id}" type="button"
+      <button class="card-media" data-open="${id}" type="button"
               aria-label="${store.escapeHtml(item.title || 'Untitled')}">
         ${media}
         ${pageBadge}${localBadge}
@@ -123,8 +99,8 @@ export function render() {
 
   // stats
   const s = store.stats();
-  $('statTabs').textContent = String(s.tabs);
-  $('statRecs').textContent = String(s.recordings);
+  $('statGuitar').textContent = String(s.guitar);
+  $('statPiano').textContent = String(s.piano);
   $('statPages').textContent = String(s.pages);
 
   // result line
@@ -165,22 +141,7 @@ export function render() {
     }
   }
 
-  renderSyncState();
   firstPaint = false;
-}
-
-function renderSyncState() {
-  const settings = db.getSettings();
-  const s = store.stats();
-  const node = $('syncState');
-  if (!node) return;
-  if (settings.repo && settings.token) {
-    node.textContent = s.unpublished
-      ? `${s.unpublished} unpublished · ${settings.repo}`
-      : `Synced with ${settings.repo}`;
-  } else {
-    node.textContent = s.unpublished ? `${s.unpublished} saved on this device` : 'Local only';
-  }
 }
 
 /* ── grid interactions ─────────────────────────────────────── */
