@@ -4,8 +4,8 @@
    nothing is lost if the tab is closed.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as db from './db.js?v=8';
-import * as store from './store.js?v=8';
+import * as db from './db.js?v=9';
+import * as store from './store.js?v=9';
 
 const $ = (id) => document.getElementById(id);
 

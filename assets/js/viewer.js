@@ -2,8 +2,8 @@
    viewer.js — full-screen reader: pages, zoom, swipe navigation.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as store from './store.js?v=8';
-import { toast } from './ui.js?v=8';
+import * as store from './store.js?v=9';
+import { toast } from './ui.js?v=9';
 
 const $ = (id) => document.getElementById(id);
 
@@ -179,13 +179,20 @@ function applyWindow(center) {
   });
 }
 
+/**
+ * An <img> with alt text but no src renders the browser's broken-image icon,
+ * so pages outside the window get this transparent pixel instead of having
+ * their src removed. The box keeps its size via `aspect-ratio`.
+ */
+const BLANK_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 function paintImage(img, index) {
   const url = vs.pageUrls?.[index];
   if (!url) return;
   if (img.dataset.want === '1') {
     if (img.getAttribute('src') !== url) img.src = url;
-  } else if (img.hasAttribute('src')) {
-    img.removeAttribute('src');
+  } else if (img.getAttribute('src') !== BLANK_PIXEL) {
+    img.src = BLANK_PIXEL;
   }
 }
 
@@ -326,14 +333,17 @@ async function renderItem(resetScroll) {
       paintImage(img, index);
     }).catch(() => { /* ignore */ });
     img.addEventListener('error', async () => {
-      if (!img.hasAttribute('src')) return;
+      const current = img.getAttribute('src');
+      if (!current || current === BLANK_PIXEL) return;
       const tries = Number(img.dataset.tries || 0);
       if (tries < 2) {
         img.dataset.tries = String(tries + 1);
         setTimeout(() => {
-          img.removeAttribute('src');
           const url = vs.pageUrls?.[index];
-          if (url && img.dataset.want === '1') img.src = url;
+          if (url && img.dataset.want === '1') {
+            img.src = BLANK_PIXEL;
+            requestAnimationFrame(() => { img.src = url; });
+          }
         }, 400 * (tries + 1));
         return;
       }
@@ -341,7 +351,7 @@ async function renderItem(resetScroll) {
       if (img.dataset.rescued !== '1') {
         img.dataset.rescued = '1';
         try {
-          const png = await reencode(img.getAttribute('src'));
+          const png = await reencode(current);
           if (png) {
             img.src = png;
             return;
