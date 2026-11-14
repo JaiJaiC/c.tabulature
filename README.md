@@ -137,6 +137,24 @@ secure/                  encrypted Fingerstyle pages
 | `Esc` | close reader or dialog |
 | `Ctrl/Cmd + Enter` | save in the edit sheet |
 
+## Adding a tab on Windows
+
+Drop new images into `1.Guitar/`, or PDFs into `2.Piano/` or `3.Fingerstyle/`,
+then **double-click `update.cmd`** in the project root.
+
+It finds Python, rebuilds the manifest and thumbnails, re-encrypts the locked
+shelves only when their sources changed, bumps the asset version (so no browser
+keeps a stale build) and pushes to `main`. The window stays open so you can read
+the result.
+
+From a terminal, with options:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\update.ps1           # build + push
+powershell -ExecutionPolicy Bypass -File scripts\update.ps1 -NoPush   # commit locally only
+powershell -ExecutionPolicy Bypass -File scripts\update.ps1 -Force    # re-encrypt even if unchanged
+```
+
 ## Deploying
 
 The site is served by GitHub Pages from the **`gh-pages`** branch, while **`main`**
