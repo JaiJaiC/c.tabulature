@@ -110,16 +110,22 @@ scripts/                 library builder, dev server, deploy helper
 
 ## Deploying
 
+The site is served by GitHub Pages from the **`gh-pages`** branch, while **`main`**
+stays the single source of truth. `.github/workflows/sync.yml` mirrors `main`
+onto `gh-pages` on every push — including commits made by the in-browser
+publisher — so you normally only ever touch `main`.
+
 ```bash
-node scripts/deploy-github.mjs create   # first time only
-node scripts/deploy-github.mjs pages    # enable GitHub Pages
-node scripts/deploy-github.mjs status   # build status + URL
+git push origin main                       # code change → site rebuilds in ~1 min
+
+node scripts/deploy-github.mjs push "…"    # same thing through the GitHub API
+node scripts/deploy-github.mjs status      # Pages build status + URL
 ```
 
-Both commands expect a token in `.gh-token` (git-ignored) or `GITHUB_TOKEN`.
-
-Content is served from the `main` branch root. `.nojekyll` keeps Jekyll out of
-the way.
+The helper commands read a token from `.gh-token` (git-ignored) or `GITHUB_TOKEN`.
+Enabling Pages itself needs `administration` permission, so if the site is ever
+switched off just turn it back on under **Settings → Pages** (branch `gh-pages`,
+root). `.nojekyll` keeps Jekyll out of the way.
 
 ---
 
