@@ -2,15 +2,15 @@
    app.js — wiring: search, filters, add menu, settings, backup.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as db from './db.js?v=9';
-import * as store from './store.js?v=9';
-import * as ui from './ui.js?v=9';
-import * as viewer from './viewer.js?v=9';
-import * as editor from './editor.js?v=9';
-import * as importer from './importer.js?v=9';
-import * as github from './github.js?v=9';
-import * as secure from './secure.js?v=9';
-import { showReport } from './diag.js?v=9';
+import * as db from './db.js?v=10';
+import * as store from './store.js?v=10';
+import * as ui from './ui.js?v=10';
+import * as viewer from './viewer.js?v=10';
+import * as editor from './editor.js?v=10';
+import * as importer from './importer.js?v=10';
+import * as github from './github.js?v=10';
+import * as secure from './secure.js?v=10';
+import { showReport } from './diag.js?v=10';
 
 const $ = (id) => document.getElementById(id);
 

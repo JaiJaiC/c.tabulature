@@ -2,8 +2,8 @@
    viewer.js — full-screen reader: pages, zoom, swipe navigation.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as store from './store.js?v=9';
-import { toast } from './ui.js?v=9';
+import * as store from './store.js?v=10';
+import { toast } from './ui.js?v=10';
 
 const $ = (id) => document.getElementById(id);
 
@@ -327,11 +327,20 @@ async function renderItem(resetScroll) {
     if (page.w && page.h) img.style.aspectRatio = `${page.w} / ${page.h}`;
     img.decoding = 'async';
     img.loading = 'eager';
-    store.urlForPage(page).then((url) => {
-      if (!url) return;
+    img.src = BLANK_PIXEL;
+
+    const fetchPage = () => store.urlForPage(page).then((url) => {
+      if (!url) throw new Error('empty page');
       vs.pageUrls[index] = url;
       paintImage(img, index);
-    }).catch(() => { /* ignore */ });
+    });
+    fetchPage().catch(() => setTimeout(() => {
+      fetchPage().catch(() => {
+        img.classList.add('is-failed');
+        img.alt = `Page ${index + 1} could not be loaded`;
+        noteFailure();
+      });
+    }, 800));
     img.addEventListener('error', async () => {
       const current = img.getAttribute('src');
       if (!current || current === BLANK_PIXEL) return;
