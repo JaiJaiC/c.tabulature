@@ -97,7 +97,7 @@ export function lock() {
 /**
  * Decrypts one page and hands back a `data:` URL.
  *
- * It used to be a `blob:` URL, but some Edge/security-software setups refuse
+ * Pages are PNG so every browser can decode them. The URL used to be a `blob:`, but
  * to decode blobs created on the fly, which surfaced as a broken-image icon.
  * A data URL is plain text, so nothing can block it.
  */
@@ -113,7 +113,7 @@ export async function pageUrl(encPath) {
   const ciphertext = raw.slice(12);
   const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, state.key, ciphertext);
 
-  const url = await toDataUrl(new Blob([plain], { type: 'image/webp' }));
+  const url = await toDataUrl(new Blob([plain], { type: 'image/png' }));
   urls.set(encPath, url);
   return url;
 }

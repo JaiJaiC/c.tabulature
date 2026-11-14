@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the locked shelves into WebP pages for the encrypted bundle.
+"""Render the locked shelves into PNG pages for the encrypted bundle.
 
     2.Piano/*.pdf|png   -> type "piano"
     3.Fingerstyle/*.pdf -> type "fingerstyle"
@@ -7,8 +7,8 @@
 Output is a staging folder (never committed):
 
     .secure_staging/
-        <id>/p1.webp ...   full-size pages
-        <id>/t1.webp       grid thumbnail (page 1)
+        <id>/p1.png ...    full-size pages
+        <id>/t1.png        grid thumbnail (page 1)
         manifest.json      plaintext titles, consumed by build_secure.mjs
 
 Usage:
@@ -58,9 +58,10 @@ def make_id(prefix: str, name: str) -> str:
     return f"{prefix}_" + hashlib.sha1(name.encode("utf-8")).hexdigest()[:12]
 
 
-def to_webp(img: Image.Image, quality: int) -> bytes:
+def to_png(img: Image.Image) -> bytes:
+    """PNG on purpose: it decodes everywhere, unlike WebP on some setups."""
     buffer = io.BytesIO()
-    img.save(buffer, "WEBP", quality=quality, method=6)
+    img.save(buffer, "PNG", optimize=True)
     return buffer.getvalue()
 
 
@@ -72,14 +73,14 @@ def render_pdf(pdf: Path, out_dir: Path, prefix: str) -> list[dict]:
             zoom = PAGE_WIDTH / page.rect.width if page.rect.width else 1
             pix = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False)
             img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
-            (out_dir / f"p{index}.webp").write_bytes(to_webp(img, QUALITY))
+            (out_dir / f"p{index}.png").write_bytes(to_png(img))
 
-            entry = {"full": f"{make_id(prefix, pdf.name)}/p{index}.webp", "w": img.width, "h": img.height}
+            entry = {"full": f"{make_id(prefix, pdf.name)}/p{index}.png", "w": img.width, "h": img.height}
             if index == 1:
                 ratio = THUMB_WIDTH / img.width
                 thumb = img.resize((THUMB_WIDTH, max(1, round(img.height * ratio))), Image.LANCZOS)
-                (out_dir / "t1.webp").write_bytes(to_webp(thumb, THUMB_QUALITY))
-                entry["thumb"] = f"{make_id(prefix, pdf.name)}/t1.webp"
+                (out_dir / "t1.png").write_bytes(to_png(thumb))
+                entry["thumb"] = f"{make_id(prefix, pdf.name)}/t1.png"
             pages.append(entry)
     finally:
         doc.close()
@@ -92,13 +93,13 @@ def render_image(path: Path, out_dir: Path, prefix: str) -> list[dict]:
         if img.width > PAGE_WIDTH:
             ratio = PAGE_WIDTH / img.width
             img = img.resize((PAGE_WIDTH, max(1, round(img.height * ratio))), Image.LANCZOS)
-        (out_dir / "p1.webp").write_bytes(to_webp(img, QUALITY))
+        (out_dir / "p1.png").write_bytes(to_png(img))
         ratio = THUMB_WIDTH / img.width
         thumb = img.resize((THUMB_WIDTH, max(1, round(img.height * ratio))), Image.LANCZOS)
-        (out_dir / "t1.webp").write_bytes(to_webp(thumb, THUMB_QUALITY))
+        (out_dir / "t1.png").write_bytes(to_png(thumb))
         return [{
-            "full": f"{make_id(prefix, path.name)}/p1.webp",
-            "thumb": f"{make_id(prefix, path.name)}/t1.webp",
+            "full": f"{make_id(prefix, path.name)}/p1.png",
+            "thumb": f"{make_id(prefix, path.name)}/t1.png",
             "w": img.width,
             "h": img.height,
         }]
