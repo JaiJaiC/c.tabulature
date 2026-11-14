@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Build data/library.json + thumbs/*.webp from the public shelves.
 
-    1.Guitar/       -> type "guitar"
-    2.Piano/        -> type "piano"
-    3.Fingerstyle/  -> NOT handled here: those PDFs are rendered and
-                       encrypted by build_secure.py + build_secure.mjs
+    1.Guitar/       -> type "guitar" (public)
+    2.Piano/        -> NOT handled here (locked, encrypted)
+    3.Fingerstyle/  -> NOT handled here (locked, encrypted)
 
 Safe to run repeatedly: entries published from the website (source ==
 "cloud") are preserved, while seeded entries are regenerated from disk.
@@ -35,7 +34,8 @@ THUMBS = ROOT / "thumbs"
 
 SECTIONS = [
     ("1.Guitar", "guitar"),
-    ("2.Piano", "piano"),
+    # 2.Piano and 3.Fingerstyle are locked: they are rendered + encrypted by
+    # build_secure.py / build_secure.mjs and never touch the public manifest.
 ]
 
 IMAGE_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif"}

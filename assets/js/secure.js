@@ -1,33 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════
-   secure.js — the locked Fingerstyle shelf.
+   secure.js — the locked shelves (Piano + Fingerstyle).
 
    The repository only holds ciphertext (secure/*.enc). Nothing is
    readable until the password is entered; the derived AES key lives
-   in this tab's sessionStorage and never touches the network.
+   in memory only, so every refresh asks again.
    ═══════════════════════════════════════════════════════════════ */
 
 const MAGIC = 'TBL1';
 const INDEX_PATH = 'secure/index.enc';
-const SESSION_KEY = 'tablature.secure';
 
 const state = { key: null, items: [], unlocked: false };
 const urls = new Map();
 
 /* ── helpers ───────────────────────────────────────────────── */
 
-function toBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  return btoa(binary);
-}
-
-function fromBase64(text) {
-  const binary = atob(text);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
-}
 
 async function deriveKey(password, salt, iterations) {
   const material = await crypto.subtle.importKey(
@@ -41,14 +27,11 @@ async function deriveKey(password, salt, iterations) {
     { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
     material,
     { name: 'AES-GCM', length: 256 },
-    true,
+    false,
     ['decrypt'],
   );
 }
 
-async function importRawKey(raw) {
-  return crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, true, ['decrypt']);
-}
 
 /* ── public state ──────────────────────────────────────────── */
 
@@ -94,39 +77,7 @@ export async function unlock(password) {
   state.key = key;
   state.items = list;
   state.unlocked = true;
-
-  persist();
   return list;
-}
-
-function persist() {
-  try {
-    crypto.subtle.exportKey('raw', state.key).then((raw) => {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-        key: toBase64(raw),
-        items: state.items,
-      }));
-    }).catch(() => {});
-  } catch { /* private mode */ }
-}
-
-/** Re-open a shelf that was unlocked earlier in this browser session. */
-export async function restore() {
-  let saved;
-  try {
-    saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
-  } catch {
-    saved = null;
-  }
-  if (!saved?.key || !Array.isArray(saved.items)) return false;
-  try {
-    state.key = await importRawKey(fromBase64(saved.key));
-    state.items = saved.items;
-    state.unlocked = true;
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 export function lock() {
@@ -135,7 +86,6 @@ export function lock() {
   state.unlocked = false;
   for (const url of urls.values()) URL.revokeObjectURL(url);
   urls.clear();
-  try { sessionStorage.removeItem(SESSION_KEY); } catch { /* ignore */ }
 }
 
 /* ── decrypt on demand ─────────────────────────────────────── */

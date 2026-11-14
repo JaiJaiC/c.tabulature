@@ -16,9 +16,16 @@ const vs = {
   zoom: 1,
   base: 0,
   list: [],
+  page: 0,
+  spread: false,
   onEdit: null,
   lastFocus: null,
 };
+
+/** Piano and Fingerstyle read page-by-page; guitar jumps between scores. */
+function isPaged(item) {
+  return Boolean(item) && (item.type === 'piano' || item.type === 'fingerstyle');
+}
 
 /* ── open / close ──────────────────────────────────────────── */
 
@@ -35,6 +42,20 @@ export function init({ onEdit }) {
     if (vs.id && vs.onEdit) vs.onEdit(vs.id);
   });
   $('downloadItem').addEventListener('click', download);
+  $('toggleSpread').addEventListener('click', () => {
+    vs.spread = !vs.spread;
+    applySpread();
+  });
+  $('toggleFullscreen').addEventListener('click', toggleFullscreen);
+
+  document.addEventListener('fullscreenchange', () => {
+    const active = Boolean(document.fullscreenElement);
+    $('toggleFullscreen').classList.toggle('is-on', active);
+    $('viewer').classList.toggle('is-immersive', active);
+    recompute();
+  });
+
+  $('viewerScroll').addEventListener('scroll', debounce(trackPage, 90), { passive: true });
 
   document.addEventListener('keydown', onKey);
   window.addEventListener('resize', debounce(recompute, 120));
@@ -49,6 +70,7 @@ export function open(id) {
   vs.lastFocus = document.activeElement;
   vs.id = id;
   vs.zoom = 1;
+  vs.page = 0;
   vs.list = store.visibleItems().map((i) => i.id);
   if (!vs.list.includes(id)) vs.list = [id];
 
@@ -88,18 +110,108 @@ export function reload() {
 /* ── navigation ────────────────────────────────────────────── */
 
 function step(delta) {
+  const item = store.getItem(vs.id);
+  if (isPaged(item)) {
+    stepPage(delta);
+    return;
+  }
   if (!vs.list.length) return;
   const i = vs.list.indexOf(vs.id);
   const next = i + delta;
   if (next < 0 || next >= vs.list.length) return;
   vs.id = vs.list[next];
   vs.zoom = 1;
+  vs.page = 0;
   renderItem(true);
 }
 
+function pageImages() {
+  return [...$('viewerPages').querySelectorAll('img')];
+}
+
+function stepPage(delta) {
+  const images = pageImages();
+  if (images.length < 2) return;
+  const stride = vs.spread ? 2 : 1;
+  const next = Math.min(images.length - 1, Math.max(0, vs.page + delta * stride));
+  if (next === vs.page) return;
+  vs.page = next;
+  scrollToPage(next);
+  setCounter();
+}
+
+function scrollToPage(index) {
+  const images = pageImages();
+  const target = images[index];
+  if (!target) return;
+  const scroll = $('viewerScroll');
+  scroll.scrollTo({ top: Math.max(0, target.offsetTop - 18), behavior: 'smooth' });
+}
+
+function trackPage() {
+  if (!isOpen()) return;
+  const item = store.getItem(vs.id);
+  if (!isPaged(item)) return;
+  const images = pageImages();
+  if (images.length < 2) return;
+  const top = $('viewerScroll').scrollTop + 80;
+  let index = 0;
+  images.forEach((img, i) => {
+    if (img.offsetTop <= top) index = i;
+  });
+  if (index !== vs.page) {
+    vs.page = index;
+    setCounter();
+  }
+}
+
+function applySpread() {
+  const host = $('viewerPages');
+  host.classList.toggle('is-spread', vs.spread);
+  $('toggleSpread').classList.toggle('is-on', vs.spread);
+  if (vs.spread && vs.page % 2 === 1) vs.page -= 1;
+  recompute();
+  scrollToPage(vs.page);
+  setCounter();
+}
+
+async function toggleFullscreen() {
+  const viewer = $('viewer');
+  if (document.fullscreenElement) {
+    try { await document.exitFullscreen(); } catch { /* ignore */ }
+    return;
+  }
+  try {
+    await viewer.requestFullscreen({ navigationUI: 'hide' });
+  } catch {
+    // iPhone Safari has no element fullscreen - give the page more room instead.
+    const immersive = !viewer.classList.contains('is-immersive');
+    viewer.classList.toggle('is-immersive', immersive);
+    $('toggleFullscreen').classList.toggle('is-on', immersive);
+    recompute();
+  }
+}
+
 function setCounter() {
+  const item = store.getItem(vs.id);
+  const counter = $('viewerCounter');
+
+  if (isPaged(item)) {
+    const total = item.pages?.length || 0;
+    if (total > 1) {
+      const start = vs.page + 1;
+      const end = vs.spread && start + 1 <= total ? start + 1 : start;
+      counter.textContent = start === end ? `${start} / ${total}` : `${start}-${end} / ${total}`;
+    } else {
+      counter.textContent = '';
+    }
+    $('prevItem').disabled = vs.page <= 0;
+    $('nextItem').disabled = vs.page >= total - 1;
+    return;
+  }
+
   const i = vs.list.indexOf(vs.id);
-  $('viewerCounter').textContent = vs.list.length > 1 ? `${i + 1} / ${vs.list.length}` : '';
+  counter.textContent = vs.list.length > 1 ? `${i + 1} / ${vs.list.length}` : '';
   $('prevItem').disabled = i <= 0;
   $('nextItem').disabled = i >= vs.list.length - 1;
 }
@@ -113,9 +225,12 @@ async function renderItem(resetScroll) {
     return;
   }
 
+  vs.page = 0;
   $('viewerTitle').textContent = item.title || 'Untitled';
   $('viewerSub').textContent = store.subtitle(item);
   $('editItem').hidden = Boolean(item.secure);
+  $('toggleSpread').hidden = !(isPaged(item) && (item.pages?.length || 0) > 1);
+  $('viewerPages').classList.toggle('is-spread', vs.spread);
   setCounter();
   $('zoomReset').textContent = '100%';
   renderFooter(item);

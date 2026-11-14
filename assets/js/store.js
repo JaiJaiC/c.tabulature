@@ -126,7 +126,8 @@ function merge() {
   }
   for (const item of secure.items()) {
     if (!item?.id || map.has(item.id)) continue;
-    map.set(item.id, { ...item, type: 'fingerstyle', source: 'secure', secure: true });
+    const kind = item.type === 'piano' ? 'piano' : 'fingerstyle';
+    map.set(item.id, { ...item, type: kind, source: 'secure', secure: true });
   }
   return [...map.values()];
 }

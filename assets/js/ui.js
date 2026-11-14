@@ -91,6 +91,18 @@ async function hydrateImages(root) {
   }));
 }
 
+const LOCK_SVG = `<svg class="stat-lock" viewBox="0 0 24 24" aria-hidden="true">
+  <rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/>
+  <path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>`;
+
+function setStat(id, value) {
+  const node = $(id);
+  if (!node) return;
+  if (value === null) node.innerHTML = LOCK_SVG;
+  else node.textContent = value;
+}
+
 /* ── render ────────────────────────────────────────────────── */
 
 export function render() {
@@ -113,21 +125,11 @@ export function render() {
 
   // stats
   const s = store.stats();
+  const locked = !secure.isUnlocked();
   $('statGuitar').textContent = String(s.guitar);
-  $('statPiano').textContent = String(s.piano);
   $('statPages').textContent = String(s.pages);
-
-  const fs = $('statFingerstyle');
-  if (fs) {
-    if (secure.isUnlocked()) {
-      fs.textContent = String(s.fingerstyle);
-    } else {
-      fs.innerHTML = `<svg class="stat-lock" viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/>
-        <path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>`;
-    }
-  }
+  setStat('statPiano', locked ? null : String(s.piano));
+  setStat('statFingerstyle', locked ? null : String(s.fingerstyle));
 
   // result line
   if (q) {

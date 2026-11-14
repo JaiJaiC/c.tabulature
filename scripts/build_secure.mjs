@@ -71,7 +71,7 @@ for (const item of manifest.items) {
   const createdAt = new Date(Date.UTC(2026, 0, 1) - item.order * 60000).toISOString();
   items.push({
     id: item.id,
-    type: 'fingerstyle',
+    type: item.type === 'piano' ? 'piano' : 'fingerstyle',
     title: item.title,
     artist: item.arranger || '',
     capo: '',

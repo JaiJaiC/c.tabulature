@@ -41,8 +41,11 @@ async function boot() {
     if (viewer.isOpen()) viewer.reload();
   });
 
-  if (await secure.restore().catch(() => false)) markUnlocked();
   await store.init();
+  if (['piano', 'fingerstyle'].includes(store.state.filter) && !secure.isUnlocked()) {
+    applyFilter('all');
+  }
+  renderVerse();
   ui.render();
   syncFormFromSettings();
 }
@@ -81,7 +84,8 @@ function bindChrome() {
     const chip = event.target.closest('.chip');
     if (!chip) return;
     const filter = chip.getAttribute('data-filter');
-    if (filter === 'fingerstyle' && !secure.isUnlocked()) {
+    if (LOCKED_SHELVES.includes(filter) && !secure.isUnlocked()) {
+      pendingFilter = filter;
       openGate();
       return;
     }
@@ -391,6 +395,9 @@ async function restoreBackup(file) {
 
 /* ── protected shelf ───────────────────────────────────────── */
 
+const LOCKED_SHELVES = ['piano', 'fingerstyle'];
+let pendingFilter = 'piano';
+
 function applyFilter(filter) {
   document.querySelectorAll('.chip').forEach((c) => {
     c.classList.toggle('is-active', c.getAttribute('data-filter') === filter);
@@ -399,8 +406,7 @@ function applyFilter(filter) {
 }
 
 function markUnlocked() {
-  const chip = document.querySelector('.chip[data-filter="fingerstyle"]');
-  if (chip) chip.classList.add('is-unlocked');
+  document.querySelectorAll('.chip-locked').forEach((chip) => chip.classList.add('is-unlocked'));
 }
 
 function openGate() {
@@ -430,8 +436,8 @@ async function submitGate() {
     store.invalidateMerge();
     markUnlocked();
     closeGate();
-    applyFilter('fingerstyle');
-    ui.toast('Fingerstyle unlocked');
+    applyFilter(pendingFilter);
+    ui.toast('Shelf unlocked');
   } catch (err) {
     $('gateError').hidden = false;
     $('gateError').textContent = err.message === 'Wrong password'
@@ -456,6 +462,61 @@ function bindGate() {
   $('gate').addEventListener('mousedown', (event) => {
     if (event.target === $('gate')) closeGate();
   });
+}
+
+/* ── a new verse every day ─────────────────────────────────── */
+
+const VERSES = [
+  'Some strings remember the evening better than we do.',
+  'Every song is a room you can walk back into.',
+  'The quiet between two notes is still music.',
+  'What the hands forget, the page keeps.',
+  'Play it slowly enough and the night slows down with you.',
+  'A page of tablature is a letter to your future hands.',
+  'Strings hold the light long after the sound has gone.',
+  'Practice is patience wearing a familiar shape.',
+  'Even silence keeps time.',
+  'The best takes are the ones nobody was listening to.',
+  'Between the frets lives a small and generous silence.',
+  'Songs do not end; they simply stop being played.',
+  'Every melody is borrowed light, passed hand to hand.',
+  'You are never playing alone in an empty room.',
+  'Old scores smell of rain on warm wood.',
+  'The strings forgive everything the page remembers.',
+];
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function random() {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * One verse per calendar day. Each block of VERSES.length days is a fresh
+ * shuffle, so a line never repeats until every other line has been shown.
+ */
+function verseOfTheDay(date = new Date()) {
+  const day = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+  const count = VERSES.length;
+  const cycle = Math.floor(day / count);
+  const position = day % count;
+  const random = mulberry32((cycle + 1) * 0x9e3779b9);
+  const order = VERSES.map((_, index) => index);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return VERSES[order[position]];
+}
+
+function renderVerse() {
+  const node = $('verse');
+  if (node) node.textContent = verseOfTheDay();
 }
 
 /* ── go ────────────────────────────────────────────────────── */
