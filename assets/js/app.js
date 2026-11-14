@@ -9,6 +9,7 @@ import * as viewer from './viewer.js';
 import * as editor from './editor.js';
 import * as importer from './importer.js';
 import * as github from './github.js';
+import * as secure from './secure.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -33,12 +34,14 @@ async function boot() {
   ui.bindGrid((id) => viewer.open(id));
   bindChrome();
   bindSettings();
+  bindGate();
 
   store.subscribe(() => {
     ui.render();
     if (viewer.isOpen()) viewer.reload();
   });
 
+  if (await secure.restore().catch(() => false)) markUnlocked();
   await store.init();
   ui.render();
   syncFormFromSettings();
@@ -78,8 +81,11 @@ function bindChrome() {
     const chip = event.target.closest('.chip');
     if (!chip) return;
     const filter = chip.getAttribute('data-filter');
-    document.querySelectorAll('.chip').forEach((c) => c.classList.toggle('is-active', c === chip));
-    store.setFilter(filter);
+    if (filter === 'fingerstyle' && !secure.isUnlocked()) {
+      openGate();
+      return;
+    }
+    applyFilter(filter);
   });
 
   $('refreshBtn').addEventListener('click', async () => {
@@ -381,6 +387,75 @@ async function restoreBackup(file) {
   } catch (err) {
     ui.toast(err.message || 'Restore failed', { error: true, ms: 4200 });
   }
+}
+
+/* ── protected shelf ───────────────────────────────────────── */
+
+function applyFilter(filter) {
+  document.querySelectorAll('.chip').forEach((c) => {
+    c.classList.toggle('is-active', c.getAttribute('data-filter') === filter);
+  });
+  store.setFilter(filter);
+}
+
+function markUnlocked() {
+  const chip = document.querySelector('.chip[data-filter="fingerstyle"]');
+  if (chip) chip.classList.add('is-unlocked');
+}
+
+function openGate() {
+  $('gateError').hidden = true;
+  $('gatePass').value = '';
+  $('gate').hidden = false;
+  document.body.classList.add('no-scroll');
+  setTimeout(() => $('gatePass').focus({ preventScroll: true }), 40);
+}
+
+function closeGate() {
+  $('gate').hidden = true;
+  document.body.classList.remove('no-scroll');
+}
+
+async function submitGate() {
+  const password = $('gatePass').value;
+  if (!password) {
+    $('gatePass').focus();
+    return;
+  }
+  const btn = $('gateSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Unlocking…';
+  try {
+    await secure.unlock(password);
+    store.invalidateMerge();
+    markUnlocked();
+    closeGate();
+    applyFilter('fingerstyle');
+    ui.toast('Fingerstyle unlocked');
+  } catch (err) {
+    $('gateError').hidden = false;
+    $('gateError').textContent = err.message === 'Wrong password'
+      ? 'Wrong password — try again.'
+      : err.message;
+    $('gatePass').select();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Unlock';
+  }
+}
+
+function bindGate() {
+  $('gateSubmit').addEventListener('click', submitGate);
+  $('gatePass').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      submitGate();
+    }
+  });
+  $('gate').querySelectorAll('[data-close]').forEach((btn) => btn.addEventListener('click', closeGate));
+  $('gate').addEventListener('mousedown', (event) => {
+    if (event.target === $('gate')) closeGate();
+  });
 }
 
 /* ── go ────────────────────────────────────────────────────── */

@@ -72,6 +72,7 @@
     <dl class="stats" id="stats">
       <div><dt>Guitar</dt><dd id="statGuitar">—</dd></div>
       <div><dt>Piano</dt><dd id="statPiano">—</dd></div>
+      <div><dt>Fingerstyle</dt><dd id="statFingerstyle"></dd></div>
       <div><dt>Pages</dt><dd id="statPages">—</dd></div>
     </dl>
   </section>
@@ -81,6 +82,14 @@
       <button class="chip is-active" data-filter="all" type="button">All <span class="chip-count" data-count="all"></span></button>
       <button class="chip" data-filter="guitar" type="button">Guitar <span class="chip-count" data-count="guitar"></span></button>
       <button class="chip" data-filter="piano" type="button">Piano <span class="chip-count" data-count="piano"></span></button>
+      <button class="chip chip-locked" data-filter="fingerstyle" type="button">
+        <svg class="chip-lock" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"/>
+          <path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        </svg>
+        Fingerstyle
+        <span class="chip-count" data-count="fingerstyle"></span>
+      </button>
     </div>
     <div class="filter-right">
       <button class="btn btn-ghost icon-only" id="refreshBtn" title="Reload library" aria-label="Reload library">
@@ -115,7 +124,7 @@
       <path d="M8 32v4a4 4 0 004 4h24a4 4 0 004-4v-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
     </svg>
     <p class="drop-title">Drop to add</p>
-    <p class="drop-sub">Images become tabs · audio becomes recordings</p>
+    <p class="drop-sub">Drop an image — it is saved straight away</p>
   </div>
 </div>
 
@@ -156,6 +165,31 @@
     </button>
   </div>
   <div class="viewer-foot" id="viewerFoot"></div>
+</div>
+
+<!-- ══ Password gate ══ -->
+<div class="modal" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle" hidden>
+  <div class="modal-panel modal-narrow">
+    <header class="modal-head">
+      <h2 id="gateTitle">Fingerstyle is locked</h2>
+      <button class="tool" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+    <div class="modal-body">
+      <p class="muted">These scores are stored encrypted. Enter the password once — the shelf stays unlocked for this browser tab.</p>
+      <div class="field">
+        <label for="gatePass">Password</label>
+        <input id="gatePass" type="password" autocomplete="current-password" placeholder="Password">
+      </div>
+      <p class="gate-error" id="gateError" hidden>Wrong password — try again.</p>
+    </div>
+    <footer class="modal-foot">
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" data-close type="button">Cancel</button>
+      <button class="btn btn-primary" id="gateSubmit" type="button">Unlock</button>
+    </footer>
+  </div>
 </div>
 
 <!-- ══ Editor ══ -->

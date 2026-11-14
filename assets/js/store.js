@@ -5,6 +5,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 import * as db from './db.js';
+import * as secure from './secure.js';
 
 export const state = {
   manifestItems: [],
@@ -42,6 +43,7 @@ export function revokeUrl(key) {
 
 export async function urlForPage(page) {
   if (!page) return '';
+  if (page.enc) return secure.pageUrl(page.enc);
   if (page.blobId) {
     if (urls.has(page.blobId)) return urls.get(page.blobId);
     const blob = await db.getBlob(page.blobId);
@@ -122,6 +124,10 @@ function merge() {
       ? { ...item, type: kind, source: 'local' }
       : { ...existing, type: existing.type, source: existing.source || 'cloud' });
   }
+  for (const item of secure.items()) {
+    if (!item?.id || map.has(item.id)) continue;
+    map.set(item.id, { ...item, type: 'fingerstyle', source: 'secure', secure: true });
+  }
   return [...map.values()];
 }
 
@@ -134,6 +140,11 @@ export function allItems() {
 function invalidate() {
   mergedCache = null;
   emit();
+}
+
+/** Called after the protected shelf is unlocked or locked. */
+export function invalidateMerge() {
+  invalidate();
 }
 
 /* ── search / filter / sort ────────────────────────────────── */
@@ -153,7 +164,9 @@ function haystack(item) {
     item.tuning,
     (item.tags || []).join(' '),
     item.notes,
-    item.type === 'piano' ? 'piano keyboard 钢琴 钢琴谱' : 'guitar tab tablature score sheet 吉他谱',
+    item.type === 'piano' ? 'piano keyboard 钢琴 钢琴谱'
+      : item.type === 'fingerstyle' ? 'fingerstyle 指弹 独奏'
+      : 'guitar tab tablature score sheet 吉他谱',
   ].join(' '));
 }
 
@@ -188,6 +201,7 @@ export function counts() {
     all: items.length,
     guitar: items.filter((i) => i.type === 'guitar').length,
     piano: items.filter((i) => i.type === 'piano').length,
+    fingerstyle: items.filter((i) => i.type === 'fingerstyle').length,
   };
 }
 
@@ -196,6 +210,7 @@ export function stats() {
   return {
     guitar: items.filter((i) => i.type === 'guitar').length,
     piano: items.filter((i) => i.type === 'piano').length,
+    fingerstyle: items.filter((i) => i.type === 'fingerstyle').length,
     pages: items.reduce((n, i) => n + (i.pages?.length || 0), 0),
     local: state.localItems.length,
     unpublished: state.localItems.filter((i) => !i.publishedAt).length,

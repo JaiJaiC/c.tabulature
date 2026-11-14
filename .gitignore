@@ -1,4 +1,4 @@
-# Local secrets — never commit a deploy token
+- Local secrets: never commit a deploy token
 .gh-token
 .github-token
 
@@ -12,3 +12,7 @@ desktop.ini
 # Logs
 *.log
 npm-debug.log*
+
+# Fingerstyle sources and staging stay local: the repo only gets ciphertext
+3.Fingerstyle/
+.secure_staging/

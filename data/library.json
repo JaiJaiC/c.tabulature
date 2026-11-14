@@ -3,7 +3,7 @@
   "updatedAt": "2026-11-13T15:28:29Z",
   "items": [
     {
-      "id": "seed_22c0b82e16",
+      "id": "seed_fd985bf8c6",
       "type": "guitar",
       "title": "一万次悲伤",
       "artist": "",
@@ -13,8 +13,8 @@
       "notes": "",
       "pages": [
         {
-          "src": "tablature/一万次悲伤.png",
-          "thumb": "thumbs/seed_22c0b82e16.webp",
+          "src": "1.Guitar/一万次悲伤.png",
+          "thumb": "thumbs/seed_fd985bf8c6.webp",
           "w": 950,
           "h": 1240
         }
@@ -24,7 +24,7 @@
       "source": "builtin"
     },
     {
-      "id": "seed_aa682a9332",
+      "id": "seed_d85c2c9c61",
       "type": "guitar",
       "title": "再见",
       "artist": "",
@@ -34,8 +34,8 @@
       "notes": "",
       "pages": [
         {
-          "src": "tablature/再见.png",
-          "thumb": "thumbs/seed_aa682a9332.webp",
+          "src": "1.Guitar/再见.png",
+          "thumb": "thumbs/seed_d85c2c9c61.webp",
           "w": 914,
           "h": 799
         }
@@ -45,7 +45,7 @@
       "source": "builtin"
     },
     {
-      "id": "seed_afaf123794",
+      "id": "seed_9dc88c7bd3",
       "type": "guitar",
       "title": "南方姑娘",
       "artist": "",
@@ -55,8 +55,8 @@
       "notes": "",
       "pages": [
         {
-          "src": "tablature/南方姑娘.png",
-          "thumb": "thumbs/seed_afaf123794.webp",
+          "src": "1.Guitar/南方姑娘.png",
+          "thumb": "thumbs/seed_9dc88c7bd3.webp",
           "w": 1198,
           "h": 1246
         }
@@ -66,7 +66,7 @@
       "source": "builtin"
     },
     {
-      "id": "seed_0cb07e48fb",
+      "id": "seed_b29bd67622",
       "type": "guitar",
       "title": "富士山下",
       "artist": "",
@@ -76,8 +76,8 @@
       "notes": "",
       "pages": [
         {
-          "src": "tablature/富士山下.png",
-          "thumb": "thumbs/seed_0cb07e48fb.webp",
+          "src": "1.Guitar/富士山下.png",
+          "thumb": "thumbs/seed_b29bd67622.webp",
           "w": 1109,
           "h": 1363
         }
@@ -87,7 +87,7 @@
       "source": "builtin"
     },
     {
-      "id": "seed_5b6aef3098",
+      "id": "seed_dc0d379420",
       "type": "guitar",
       "title": "小镇姑娘",
       "artist": "",
@@ -97,8 +97,8 @@
       "notes": "",
       "pages": [
         {
-          "src": "tablature/小镇姑娘.png",
-          "thumb": "thumbs/seed_5b6aef3098.webp",
+          "src": "1.Guitar/小镇姑娘.png",
+          "thumb": "thumbs/seed_dc0d379420.webp",
           "w": 1230,
           "h": 1040
         }
@@ -108,7 +108,7 @@
       "source": "builtin"
     },
     {
-      "id": "seed_e7efd920e7",
+      "id": "seed_178ec16223",
       "type": "guitar",
       "title": "我是真的爱上你",
       "artist": "",
@@ -118,8 +118,8 @@
       "notes": "",
       "pages": [
         {
-          "src": "tablature/我是真的爱上你.png",
-          "thumb": "thumbs/seed_e7efd920e7.webp",
+          "src": "1.Guitar/我是真的爱上你.png",
+          "thumb": "thumbs/seed_178ec16223.webp",
           "w": 986,
           "h": 1000
         }
@@ -129,7 +129,7 @@
       "source": "builtin"
     },
     {
-      "id": "seed_203f5b3c68",
+      "id": "seed_8976b0a583",
       "type": "guitar",
       "title": "我爱你中国",
       "artist": "",
@@ -139,8 +139,8 @@
       "notes": "",
       "pages": [
         {
-          "src": "tablature/我爱你中国.png",
-          "thumb": "thumbs/seed_203f5b3c68.webp",
+          "src": "1.Guitar/我爱你中国.png",
+          "thumb": "thumbs/seed_8976b0a583.webp",
           "w": 1147,
           "h": 1264
         }
@@ -150,7 +150,7 @@
       "source": "builtin"
     },
     {
-      "id": "seed_7e093d4686",
+      "id": "seed_325bdf5631",
       "type": "guitar",
       "title": "程艾影",
       "artist": "",
@@ -160,8 +160,8 @@
       "notes": "",
       "pages": [
         {
-          "src": "tablature/程艾影.png",
-          "thumb": "thumbs/seed_7e093d4686.webp",
+          "src": "1.Guitar/程艾影.png",
+          "thumb": "thumbs/seed_325bdf5631.webp",
           "w": 1168,
           "h": 963
         }

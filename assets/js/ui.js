@@ -4,6 +4,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 import * as store from './store.js';
+import * as secure from './secure.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -35,8 +36,9 @@ function cardHTML(item, index) {
 
   const src = page ? store.escapeHtml(page.thumb || page.src || '') : '';
   const blob = page?.blobId ? ` data-blob="${store.escapeHtml(page.blobId)}"` : '';
+  const enc = page?.enc ? ` data-enc="${store.escapeHtml(page.thumb || page.enc)}"` : '';
   const media = page
-    ? `<img src="${src}"${blob} alt="" loading="lazy" decoding="async" onload="this.classList.add('is-loaded')">`
+    ? `<img src="${src}"${blob}${enc} alt="" loading="lazy" decoding="async" onload="this.classList.add('is-loaded')">`
     : `<span class="page-fallback">No pages</span>`;
 
   const pageBadge = item.pages?.length > 1 ? `<span class="badge">${item.pages.length} pages</span>` : '';
@@ -62,18 +64,30 @@ function cardHTML(item, index) {
 /* ── hydrate blob-backed thumbnails ────────────────────────── */
 
 async function hydrateImages(root) {
-  const imgs = [...root.querySelectorAll('img[data-blob]')];
-  await Promise.all(imgs.map(async (img) => {
+  const blobs = [...root.querySelectorAll('img[data-blob]')];
+  await Promise.all(blobs.map(async (img) => {
     const blobId = img.getAttribute('data-blob');
     if (!blobId) return;
-    const page = { blobId };
     try {
-      const url = await store.urlForPage(page);
+      const url = await store.urlForPage({ blobId });
       if (url) {
         img.src = url;
         img.removeAttribute('data-blob');
       }
     } catch { /* leave broken */ }
+  }));
+
+  const encrypted = [...root.querySelectorAll('img[data-enc]')];
+  await Promise.all(encrypted.map(async (img) => {
+    const path = img.getAttribute('data-enc');
+    if (!path) return;
+    try {
+      const url = await secure.pageUrl(path);
+      if (url) {
+        img.src = url;
+        img.removeAttribute('data-enc');
+      }
+    } catch { /* locked or missing */ }
   }));
 }
 
@@ -102,6 +116,18 @@ export function render() {
   $('statGuitar').textContent = String(s.guitar);
   $('statPiano').textContent = String(s.piano);
   $('statPages').textContent = String(s.pages);
+
+  const fs = $('statFingerstyle');
+  if (fs) {
+    if (secure.isUnlocked()) {
+      fs.textContent = String(s.fingerstyle);
+    } else {
+      fs.innerHTML = `<svg class="stat-lock" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>`;
+    }
+  }
 
   // result line
   if (q) {

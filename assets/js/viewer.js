@@ -115,6 +115,7 @@ async function renderItem(resetScroll) {
 
   $('viewerTitle').textContent = item.title || 'Untitled';
   $('viewerSub').textContent = store.subtitle(item);
+  $('editItem').hidden = Boolean(item.secure);
   setCounter();
   $('zoomReset').textContent = '100%';
   renderFooter(item);
@@ -286,7 +287,9 @@ async function download() {
     for (let i = 0; i < pages.length; i++) {
       const url = await store.urlForPage(pages[i]);
       if (!url) continue;
-      const ext = (url.split('?')[0].match(/\.(png|jpe?g|webp|gif)$/i) || [, 'png'])[1];
+      const ext = pages[i].enc
+        ? 'webp'
+        : (url.split('?')[0].match(/\.(png|jpe?g|webp|gif)$/i) || [, 'png'])[1];
       triggerDownload(url, `${safeName(item.title)}${pages.length > 1 ? `-p${i + 1}` : ''}.${ext}`);
       if (pages.length > 1) await new Promise((r) => setTimeout(r, 260));
     }
