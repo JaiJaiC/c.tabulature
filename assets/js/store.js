@@ -4,15 +4,15 @@
    handles search, sorting and blob URL lifecycles.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as db from './db.js?v=16';
-import * as secure from './secure.js?v=16';
+import * as db from './db.js?v=17';
+import * as secure from './secure.js?v=17';
 
 export const state = {
   manifestItems: [],
   localItems: [],
   hidden: new Set(),
   query: '',
-  filter: 'all',
+  filter: 'guitar',
   ready: false,
   manifestError: null,
   lastSync: null,
@@ -79,7 +79,7 @@ export async function loadLocal() {
 
 export async function init() {
   const s = db.getSettings();
-  state.filter = ['guitar', 'piano'].includes(s.filter) ? s.filter : 'all';
+  state.filter = ['guitar', 'piano'].includes(s.filter) ? s.filter : 'guitar';
   state.hidden = new Set(Array.isArray(s.hidden) ? s.hidden : []);
   await Promise.all([loadManifest(), loadLocal()]);
   state.ready = true;
@@ -184,7 +184,7 @@ export function matches(item, query = state.query) {
 
 export function isVisible(item) {
   if (state.hidden.has(item.id)) return false;
-  if (state.filter !== 'all' && item.type !== state.filter) return false;
+  if (item.type !== state.filter) return false;
   return matches(item);
 }
 

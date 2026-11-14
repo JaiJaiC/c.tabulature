@@ -4,8 +4,8 @@
    nothing is lost if the tab is closed.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as db from './db.js?v=16';
-import * as store from './store.js?v=16';
+import * as db from './db.js?v=17';
+import * as store from './store.js?v=17';
 
 const $ = (id) => document.getElementById(id);
 
@@ -166,7 +166,7 @@ export async function appendPages(item, files) {
 /** Make sure whatever was just added is actually on screen. */
 async function revealNew() {
   const s = store.state;
-  if (s.filter !== 'all') store.setFilter('all');
+  if (s.filter !== 'guitar') store.setFilter('guitar');
   if (s.query) {
     s.query = '';
     $('search').value = '';

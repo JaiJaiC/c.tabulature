@@ -2,8 +2,8 @@
    viewer.js — full-screen reader: pages, zoom, swipe navigation.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as store from './store.js?v=16';
-import { toast } from './ui.js?v=16';
+import * as store from './store.js?v=17';
+import { toast } from './ui.js?v=17';
 
 const $ = (id) => document.getElementById(id);
 

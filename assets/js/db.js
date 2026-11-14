@@ -129,7 +129,7 @@ const DEFAULTS = {
   branch: 'main',
   token: '',
   sort: 'newest',
-  filter: 'all',
+  filter: 'guitar',
   hidden: [],
 };
 

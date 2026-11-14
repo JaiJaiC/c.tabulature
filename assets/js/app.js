@@ -2,17 +2,17 @@
    app.js — wiring: search, filters, add menu, settings, backup.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as db from './db.js?v=16';
-import * as store from './store.js?v=16';
-import * as ui from './ui.js?v=16';
-import * as viewer from './viewer.js?v=16';
-import * as editor from './editor.js?v=16';
-import * as importer from './importer.js?v=16';
-import * as github from './github.js?v=16';
-import * as secure from './secure.js?v=16';
-import { showReport } from './diag.js?v=16';
+import * as db from './db.js?v=17';
+import * as store from './store.js?v=17';
+import * as ui from './ui.js?v=17';
+import * as viewer from './viewer.js?v=17';
+import * as editor from './editor.js?v=17';
+import * as importer from './importer.js?v=17';
+import * as github from './github.js?v=17';
+import * as secure from './secure.js?v=17';
+import { showReport } from './diag.js?v=17';
 
-const BUILD = '16';
+const BUILD = '17';
 
 const $ = (id) => document.getElementById(id);
 
@@ -49,7 +49,7 @@ async function boot() {
 
   await store.init();
   if (['piano', 'fingerstyle'].includes(store.state.filter) && !secure.isUnlocked()) {
-    applyFilter('all');
+    applyFilter('guitar');
   }
   renderVerse();
   ui.render();

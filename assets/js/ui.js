@@ -3,8 +3,8 @@
    counters, chips, empty states and toasts.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as store from './store.js?v=16';
-import * as secure from './secure.js?v=16';
+import * as store from './store.js?v=17';
+import * as secure from './secure.js?v=17';
 
 const $ = (id) => document.getElementById(id);
 
@@ -137,8 +137,6 @@ export function render() {
     resultLine.innerHTML = items.length
       ? `<strong>${items.length}</strong> ${items.length === 1 ? 'match' : 'matches'} for “${store.escapeHtml(q)}”`
       : `No matches for “${store.escapeHtml(q)}”`;
-  } else if (store.state.filter !== 'all') {
-    resultLine.innerHTML = `${items.length} ${items.length === 1 ? 'item' : 'items'}`;
   } else {
     resultLine.textContent = '';
   }
@@ -164,9 +162,9 @@ export function render() {
       p.textContent = `Nothing found for “${q}”. Try a shorter word or a tag.`;
       addBtn.hidden = true;
     } else {
-      t.textContent = 'No items in this filter';
-      p.textContent = 'Switch back to “All” to see everything.';
-      addBtn.hidden = true;
+      t.textContent = 'Nothing on this shelf yet';
+      p.textContent = 'Try another shelf above, or drop an image here to add one.';
+      addBtn.hidden = false;
     }
   }
 
