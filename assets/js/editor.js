@@ -2,10 +2,10 @@
    editor.js — metadata sheet for a tab: rename, tag, add or drop pages.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as store from './store.js';
-import * as db from './db.js';
-import { toast } from './ui.js';
-import * as importer from './importer.js';
+import * as store from './store.js?v=7';
+import * as db from './db.js?v=7';
+import { toast } from './ui.js?v=7';
+import * as importer from './importer.js?v=7';
 
 const $ = (id) => document.getElementById(id);
 
