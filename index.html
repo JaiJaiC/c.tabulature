@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#050506">
-<meta name="description" content="A private guitar and piano tablature library — search, read, and add new tabs.">
-<title>Tablature — Guitar &amp; Piano Tabs</title>
+<meta name="description" content="A private guitar and piano tablature library 鈥?search, read, and add new tabs.">
+<title>Tablature 鈥?Guitar &amp; Piano Tabs</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23050506'/%3E%3Cg stroke='%23f0b357' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M8 9.5h16M8 16h16M8 22.5h16'/%3E%3C/g%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/css/styles.css?v=11">
+<link rel="stylesheet" href="assets/css/styles.css?v=12">
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
@@ -72,10 +72,10 @@
       <p class="verse" id="verse"></p>
     </div>
     <dl class="stats" id="stats">
-      <div><dt>Guitar</dt><dd id="statGuitar">—</dd></div>
+      <div><dt>Guitar</dt><dd id="statGuitar">鈥?/dd></div>
       <div><dt>Piano</dt><dd id="statPiano"></dd></div>
       <div><dt>Fingerstyle</dt><dd id="statFingerstyle"></dd></div>
-      <div><dt>Pages</dt><dd id="statPages">—</dd></div>
+      <div><dt>Pages</dt><dd id="statPages">鈥?/dd></div>
     </dl>
   </section>
 
@@ -120,12 +120,12 @@
       </g>
     </svg>
     <h2 id="emptyTitle">Nothing here yet</h2>
-    <p id="emptyText">Drag a tab image into this window — it saves automatically.</p>
+    <p id="emptyText">Drag a tab image into this window 鈥?it saves automatically.</p>
     <button class="btn btn-primary" id="emptyAdd" type="button">Add a tab</button>
   </div>
 
 </main>
-<!-- ══ Drop overlay ══ -->
+<!-- 鈺愨晲 Drop overlay 鈺愨晲 -->
 <div class="drop-overlay" id="dropOverlay" hidden>
   <div class="drop-card">
     <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -133,16 +133,16 @@
       <path d="M8 32v4a4 4 0 004 4h24a4 4 0 004-4v-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
     </svg>
     <p class="drop-title">Drop to add</p>
-    <p class="drop-sub">Drop an image — it is saved straight away</p>
+    <p class="drop-sub">Drop an image 鈥?it is saved straight away</p>
   </div>
 </div>
 
-<!-- ══ Viewer ══ -->
+<!-- 鈺愨晲 Viewer 鈺愨晲 -->
 <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="viewerTitle" hidden>
   <div class="viewer-bar">
     <div class="viewer-id">
-      <h2 id="viewerTitle">—</h2>
-      <p id="viewerSub">—</p>
+      <h2 id="viewerTitle">鈥?/h2>
+      <p id="viewerSub">鈥?/p>
     </div>
     <div class="viewer-tools">
       <span class="fail-badge" id="failBadge" hidden></span>
@@ -199,7 +199,7 @@
   </button>
 </div>
 
-<!-- ══ Password gate ══ -->
+<!-- 鈺愨晲 Password gate 鈺愨晲 -->
 <div class="modal" id="gate" role="dialog" aria-modal="true" aria-label="Password" hidden>
   <div class="modal-panel modal-narrow">
 
@@ -209,7 +209,7 @@
         <label for="gatePass">Password</label>
         <input id="gatePass" type="password" autocomplete="current-password" placeholder="Password">
       </div>
-      <p class="gate-error" id="gateError" hidden>Wrong password — try again.</p>
+      <p class="gate-error" id="gateError" hidden>Wrong password 鈥?try again.</p>
     </div>
     <footer class="modal-foot">
       <div class="spacer"></div>
@@ -219,7 +219,7 @@
   </div>
 </div>
 
-<!-- ══ Editor ══ -->
+<!-- 鈺愨晲 Editor 鈺愨晲 -->
 <div class="modal" id="editor" role="dialog" aria-modal="true" aria-labelledby="editorTitle" hidden>
   <div class="modal-panel">
     <header class="modal-head">
@@ -262,7 +262,7 @@
       </div>
       <div class="field">
         <label for="fNotes">Notes</label>
-        <textarea id="fNotes" name="notes" rows="3" maxlength="600" placeholder="Anything worth remembering…"></textarea>
+        <textarea id="fNotes" name="notes" rows="3" maxlength="600" placeholder="Anything worth remembering鈥?></textarea>
       </div>
       <div class="field" id="pagesField">
         <label>Pages <span class="hint" id="pagesHint"></span></label>
@@ -282,7 +282,7 @@
   </div>
 </div>
 
-<!-- ══ Settings ══ -->
+<!-- 鈺愨晲 Settings 鈺愨晲 -->
 <div class="modal" id="settings" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
   <div class="modal-panel">
     <header class="modal-head">
@@ -294,10 +294,10 @@
     <div class="modal-body">
       <section class="setting-block">
         <h3>This device</h3>
-        <p class="muted">Everything you add is stored in your browser first — no account, no server, works offline.</p>
+        <p class="muted">Everything you add is stored in your browser first 鈥?no account, no server, works offline.</p>
         <div class="kv"><span>Stored items</span><strong id="localCount">0</strong></div>
-        <div class="kv"><span>Storage used</span><strong id="usage">—</strong></div>
-        <div class="kv"><span>Build</span><strong id="buildTag">—</strong></div>
+        <div class="kv"><span>Storage used</span><strong id="usage">鈥?/strong></div>
+        <div class="kv"><span>Build</span><strong id="buildTag">鈥?/strong></div>
         <div class="setting-actions">
           <button class="btn btn-ghost btn-sm" id="exportBtn" type="button">Export backup</button>
           <button class="btn btn-ghost btn-sm" id="importBtn" type="button">Restore backup</button>
@@ -320,7 +320,7 @@
         </div>
         <div class="field">
           <label for="sToken">Fine-grained token <span class="hint">Contents: read &amp; write</span></label>
-          <input id="sToken" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+          <input id="sToken" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_鈥?>
         </div>
         <div class="setting-actions">
           <button class="btn btn-ghost btn-sm" id="testConnBtn" type="button">Test connection</button>
@@ -343,6 +343,6 @@
 <input type="file" id="pageInput" accept="image/*" multiple hidden>
 <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
 
-<script type="module" src="assets/js/app.js?v=11"></script>
+<script type="module" src="assets/js/app.js?v=12"></script>
 </body>
 </html>
