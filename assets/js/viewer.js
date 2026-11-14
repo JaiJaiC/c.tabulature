@@ -18,6 +18,7 @@ const vs = {
   list: [],
   page: 0,
   spread: false,
+  pageUrls: [],
   onEdit: null,
   lastFocus: null,
 };
@@ -98,6 +99,7 @@ export function close() {
   document.body.classList.remove('no-scroll');
   vs.id = null;
   vs.list = [];
+  vs.pageUrls = [];
   if (vs.lastFocus && typeof vs.lastFocus.focus === 'function') {
     vs.lastFocus.focus({ preventScroll: true });
   }
@@ -140,6 +142,31 @@ function pageImages() {
   return [...$('viewerPages').querySelectorAll('img')];
 }
 
+/**
+ * Only the pages around the current one keep a decoded bitmap. A nine page
+ * score would otherwise decode ~110 MB at once, which phones refuse to do -
+ * they show broken images instead.
+ */
+function applyWindow(center) {
+  const imgs = pageImages();
+  const from = Math.max(0, center - 1);
+  const to = Math.min(imgs.length - 1, center + 2);
+  imgs.forEach((img, index) => {
+    img.dataset.want = index >= from && index <= to ? '1' : '';
+    paintImage(img, index);
+  });
+}
+
+function paintImage(img, index) {
+  const url = vs.pageUrls?.[index];
+  if (!url) return;
+  if (img.dataset.want === '1') {
+    if (img.getAttribute('src') !== url) img.src = url;
+  } else if (img.hasAttribute('src')) {
+    img.removeAttribute('src');
+  }
+}
+
 function stepPage(delta) {
   const images = pageImages();
   if (images.length < 2) return;
@@ -147,6 +174,7 @@ function stepPage(delta) {
   const next = Math.min(images.length - 1, Math.max(0, vs.page + delta * stride));
   if (next === vs.page) return;
   vs.page = next;
+  applyWindow(next);
   scrollToPage(next);
   setCounter();
 }
@@ -172,6 +200,7 @@ function trackPage() {
   });
   if (index !== vs.page) {
     vs.page = index;
+    applyWindow(index);
     setCounter();
   }
 }
@@ -182,6 +211,7 @@ function applySpread() {
   $('toggleSpread').classList.toggle('is-on', vs.spread);
   if (vs.spread && vs.page % 2 === 1) vs.page -= 1;
   recompute();
+  applyWindow(vs.page);
   scrollToPage(vs.page);
   setCounter();
 }
@@ -260,6 +290,7 @@ async function renderItem(resetScroll) {
     p.textContent = 'This tab has no pages yet. Use the pencil to add images.';
     host.appendChild(p);
   }
+  vs.pageUrls = new Array(pages.length).fill(null);
   pages.forEach((page, index) => {
     const img = document.createElement('img');
     img.dataset.index = String(index);
@@ -268,16 +299,28 @@ async function renderItem(resetScroll) {
     img.decoding = 'async';
     img.loading = 'eager';
     store.urlForPage(page).then((url) => {
-      if (url) img.src = url;
+      if (!url) return;
+      vs.pageUrls[index] = url;
+      paintImage(img, index);
     }).catch(() => { /* ignore */ });
     img.addEventListener('error', () => {
-      const fallback = document.createElement('div');
-      fallback.className = 'page-fallback';
-      fallback.textContent = 'This image could not be loaded.';
-      img.replaceWith(fallback);
+      if (!img.hasAttribute('src')) return;
+      if (img.dataset.retried) {
+        const fallback = document.createElement('div');
+        fallback.className = 'page-fallback';
+        fallback.textContent = 'This page could not be loaded.';
+        img.replaceWith(fallback);
+        return;
+      }
+      img.dataset.retried = '1';
+      setTimeout(() => {
+        img.removeAttribute('src');
+        paintImage(img, index);
+      }, 600);
     });
     host.appendChild(img);
   });
+  applyWindow(vs.page);
 
   const scroll = $('viewerScroll');
   if (resetScroll) scroll.scrollTop = 0;
