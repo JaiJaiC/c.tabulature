@@ -2,21 +2,26 @@
    app.js — wiring: search, filters, add menu, settings, backup.
    ═══════════════════════════════════════════════════════════════ */
 
-import * as db from './db.js?v=10';
-import * as store from './store.js?v=10';
-import * as ui from './ui.js?v=10';
-import * as viewer from './viewer.js?v=10';
-import * as editor from './editor.js?v=10';
-import * as importer from './importer.js?v=10';
-import * as github from './github.js?v=10';
-import * as secure from './secure.js?v=10';
-import { showReport } from './diag.js?v=10';
+import * as db from './db.js?v=11';
+import * as store from './store.js?v=11';
+import * as ui from './ui.js?v=11';
+import * as viewer from './viewer.js?v=11';
+import * as editor from './editor.js?v=11';
+import * as importer from './importer.js?v=11';
+import * as github from './github.js?v=11';
+import * as secure from './secure.js?v=11';
+import { showReport } from './diag.js?v=11';
+
+const BUILD = '11';
 
 const $ = (id) => document.getElementById(id);
 
 /* ── boot ──────────────────────────────────────────────────── */
 
 async function boot() {
+  document.documentElement.dataset.build = BUILD;
+  const tag = document.getElementById('buildTag');
+  if (tag) tag.textContent = BUILD;
   viewer.init({ onEdit: (id) => editor.open(id) });
   editor.init({
     onSaved: (id) => {
